@@ -1,4 +1,8 @@
 var game_interval = 0;
+var score = 0;
+var level = 1;
+var newlevel = 1;
+var speed = 450;
 
 const canvas = document.getElementById("playfield");
 const width = canvas.width, height = canvas.height, main = canvas.getContext("2d"), bg = document.getElementById("background").getContext("2d");
@@ -44,10 +48,28 @@ const check_clear = function(max){ // todo: check and clear up to max
 				if (i > 1 && !dirty_rows[i-2]){
 					dirty_rows[i-2] = true;
 					if (!dirty) dirty = true;
+					incScore(1);
+					//console.log("clear "+i);
 				}
 			}
 		}
 	}
+}
+
+const incScore = function(amount){
+  score+=amount;
+  if (score>99)
+     newlevel = Math.round(score/100)
+  else
+     newlevel = 1;
+     if (newlevel!=level){
+        level = newlevel;
+        if (level>1) {
+           speed = 450 - 25*(level-1);
+           clearInterval(game_interval);
+           game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+        }
+     }
 }
 
 const draw = function(){
@@ -98,6 +120,20 @@ const draw = function(){
 			}
 		}
 		dirty = false;
+		main.font = 'bold 28px Arial';
+		main.fillStyle = "rgb(255,255,255)";
+	  main.fillText("Score: "+score,20,50);
+	  main.fillText("Level: "+level,20,100);
+	  if (!started){
+	     main.font = 'bold 30px Arial';
+		   main.fillStyle = "rgb(255,255,255)";
+		   var scores = window.highscores.getHighScores();
+		   if (scores.length>0)
+		      main.fillText("Scoreboard",width/2-100,150);
+	     for(var x=0; x<scores.length; x++){
+	        main.fillText(scores[x].pos+". "+scores[x].name+" "+scores[x].score,width/2-100,(x*50)+200);
+	     }
+	  }
 	}
 	window.requestAnimationFrame(draw);
 }
@@ -244,6 +280,11 @@ const spawn = function(type){
 					clearInterval(game_interval);
 					started = false;
 					set_field();
+					window.highscores.setScore(score);
+					window.highscores.updateScoreboard();
+					score = 0;
+					level = 1;
+					speed = 450;
 					break;
 				}
 				else if (falling.shape[0][i][j] > 0){
@@ -454,7 +495,8 @@ var started = false;
 const start = function(){
 	if (!started){
 		spawn_rand();
-		game_interval = setInterval(function(){fall(playfield, falling, true);}, 450);
+		game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
 		started = true;
 	}
 }
+window.highscores.init("Tetris");
