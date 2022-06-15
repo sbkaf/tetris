@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="format-detection" content="telephone=no">
-		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+	  <meta charset="utf-8"/>
+	  <meta name="viewport" content="width=device-width"/>
 		<link rel="stylesheet" type="text/css" href="css/index.css">
 		<title>Tetris</title>
+		<script src="webxdc.js"></script>
+		<script src="./webxdc-scores.js"></script>
 	</head>
 	<body onclick="start()">
 		<div class="app">
@@ -15,8 +17,9 @@
 					<button onclick="move(-1, playfield, falling, true)">&larr;</button>
 					<button onclick="rotate(playfield, falling, true)">&#8635;</button>
 					<button onclick="move(1, playfield, falling, true)">&rarr;</button>
-					<br>
 					<p>Touch anywhere to start.</p>
+					<br>
+					<button onclick="fall(playfield, falling, true)">&darr;</button>
 				</div>
 			</center>
 		</div>
