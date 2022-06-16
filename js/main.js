@@ -281,7 +281,6 @@ const spawn = function(type){
 					started = false;
 					set_field();
 					window.highscores.setScore(score);
-					window.highscores.updateScoreboard();
 					score = 0;
 					level = 1;
 					speed = 450;
