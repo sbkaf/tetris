@@ -5,7 +5,19 @@ var newlevel = 1;
 var speed = 450;
 
 const canvas = document.getElementById("playfield");
+const scoreboard = document.getElementById("scoreboard");
 const width = canvas.width, height = canvas.height, main = canvas.getContext("2d"), bg = document.getElementById("background").getContext("2d");
+const setup = function(){
+  let boardHeight = screen.height*2/3; 
+  scoreboard.style.height = boardHeight + "px"; 
+  scoreboard.style.top = screen.height/2 + "px"; 
+  let boardWidth = screen.width*4/5; 
+  scoreboard.style.width = boardWidth + "px";
+  scoreboard.style.left = screen.width/2 + "px"; 
+  scoreboard.style.margin = (-boardHeight/2) + "px 0 0 " + (-boardWidth/2) + "px";
+}
+setup();
+
 main.fillStyle = "rgba(255, 0, 0, 0.6)";
 bg.lineWidth = 5;
 
@@ -58,16 +70,17 @@ const check_clear = function(max){ // todo: check and clear up to max
 
 const incScore = function(amount){
   score+=amount;
-  if (score>99)
-     newlevel = Math.round(score/100)
-  else
-     newlevel = 1;
+  newlevel = Math.floor((score+100)/100);
      if (newlevel!=level){
         level = newlevel;
+        window.highscores.setScore(score);
+        clearInterval(game_interval);
+        started = false;
+        scoreboard.classList.add("opened");
         if (level>1) {
            speed = 450 - 25*(level-1);
-           clearInterval(game_interval);
-           game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+           //clearInterval(game_interval);
+           //game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
         }
      }
 }
@@ -81,44 +94,13 @@ const draw = function(){
 			bg.strokeRect(x, y, 80, 80);
 		}
 	}
+	//bg.lineWidth = 2;
+	bg.strokeStyle = "rgba(255,255,255,0.5)";
+  bg.strokeRect(0,0,width,height);
 	t += 0.0015;
 	if (t > 1){t -= 1;R.wrapz();G.wrapz();B.wrapz();A.wrapz();}
 	if (dirty){
-		for (var i = 0; i < 20; ++i){
-			if (dirty_rows[i]){
-				main.clearRect(0, i * 100, width, 100);
-				for (var j = 0; j < 10; ++j){
-					if (playfield[i+2][j] > 0){
-						main.drawImage(square_img, j * 100, i * 100);
-						switch(playfield[i+2][j]){ // note: static colors looks dull
-							case(1): // cyan
-							main.fillStyle = "rgba(0, 255, 255, 0.65)"
-							break;
-							case(2): // blue
-							main.fillStyle = "rgba(0, 0, 255, 0.65)"
-							break;
-							case(3): // orange
-							main.fillStyle = "rgba(255, 165, 0, 0.65)"
-							break;
-							case(4): // yellow
-							main.fillStyle = "rgba(255, 255, 0, 0.65)"
-							break;
-							case(5): // green
-							main.fillStyle = "rgba(0, 255, 0, 0.65)"
-							break;
-							case(6): // purple
-							main.fillStyle = "rgba(128, 0, 128, 0.65)"
-							break;
-							case(7): // red
-							main.fillStyle = "rgba(255, 0, 0, 0.65)"
-							break;
-						}
-						main.fillRect(j*100, i*100, 100, 100);
-					}
-				}
-				dirty_rows[i] = false;
-			}
-		}
+		rePaint(false);
 		dirty = false;
 		main.font = 'bold 28px Arial';
 		main.fillStyle = "rgb(255,255,255)";
@@ -127,12 +109,14 @@ const draw = function(){
 	  if (!started){
 	     main.font = 'bold 30px Arial';
 		   main.fillStyle = "rgb(255,255,255)";
-		   var scores = window.highscores.getHighScores();
-		   if (scores.length>0)
-		      main.fillText("Scoreboard",width/2-100,150);
-	     for(var x=0; x<scores.length; x++){
-	        main.fillText(scores[x].pos+". "+scores[x].name+" "+scores[x].score,width/2-100,(x*50)+200);
-	     }
+		   main.fillText("Touch anywhere to start",width/2-150,200);
+		   //var scores = window.highscores.getHighScores();
+		   if (scoreboard.innerHTML) scoreboard.classList.add("opened");
+		   //if (scores.length>0)
+		   //   main.fillText("Scoreboard",width/2-100,300);
+	     //for(var x=0; x<scores.length; x++){
+	     //   main.fillText(scores[x].pos+". "+scores[x].name+" "+scores[x].score,width/2-100,(x*50)+350);
+	     //}
 	  }
 	}
 	window.requestAnimationFrame(draw);
@@ -281,6 +265,8 @@ const spawn = function(type){
 					started = false;
 					set_field();
 					window.highscores.setScore(score);
+          scoreboard.classList.add("opened");
+					clearGame();
 					score = 0;
 					level = 1;
 					speed = 450;
@@ -493,9 +479,86 @@ const move = function(x, field, piece, render){ // input x: -1, 1
 var started = false;
 const start = function(){
 	if (!started){
-		spawn_rand();
-		game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
-		started = true;
+	  if(window.localStorage.getItem("playfield")!=undefined){
+      scoreboard.classList.remove("opened");
+	    game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+	    started = true;
+	  }  
+	  else {
+		  spawn_rand();
+		  scoreboard.classList.remove("opened");
+		  game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+		  started = true;
+	  }
+	} else {
+   rotate(playfield, falling, true)
 	}
 }
-window.highscores.init("Tetris");
+
+const rePaint = function(refresh){
+  	for (var i = 0; i < 20; ++i){
+  	  if(dirty_rows[i] || refresh){
+				main.clearRect(0, i * 100, width, 100);
+				for (var j = 0; j < 10; ++j){
+					if (playfield[i+2][j] > 0){
+						main.drawImage(square_img, j * 100, i * 100);
+						switch(playfield[i+2][j]){ // note: static colors looks dull
+							case(1): // cyan
+							main.fillStyle = "rgba(0, 255, 255, 0.65)"
+							break;
+							case(2): // blue
+							main.fillStyle = "rgba(0, 0, 255, 0.65)"
+							break;
+							case(3): // orange
+							main.fillStyle = "rgba(255, 165, 0, 0.65)"
+							break;
+							case(4): // yellow
+							main.fillStyle = "rgba(255, 255, 0, 0.65)"
+							break;
+							case(5): // green
+							main.fillStyle = "rgba(0, 255, 0, 0.65)"
+							break;
+							case(6): // purple
+							main.fillStyle = "rgba(128, 0, 128, 0.65)"
+							break;
+							case(7): // red
+							main.fillStyle = "rgba(255, 0, 0, 0.65)"
+							break;
+						}
+						main.fillRect(j*100, i*100, 100, 100);
+					}
+				}
+				dirty_rows[i] = false;
+    	}
+		}
+}
+
+const saveGame = function(){
+  window.localStorage.setItem("playfield", JSON.stringify(playfield));
+  window.localStorage.setItem("falling", JSON.stringify(falling));
+  window.localStorage.setItem("dirty_rows", JSON.stringify(dirty_rows));
+  window.localStorage.setItem("score", score);
+}
+
+const restoreGame = function(){
+  if(window.localStorage.getItem("playfield")!=undefined){
+  playfield = JSON.parse(window.localStorage.getItem("playfield"));
+  falling = JSON.parse(window.localStorage.getItem("falling"));
+  dirty_rows = JSON.parse(window.localStorage.getItem("dirty_rows"));
+  score = Number(window.localStorage.getItem("score"));
+  if(score>199)
+    level = Math.floor(score/100)
+  else
+    level = 1;
+  speed = 450 - 25*(level-1);
+  dirty = true;
+  rePaint(true);
+  }
+}
+
+const clearGame = function(){
+  window.localStorage.removeItem("playfield");
+  window.localStorage.removeItem("falling");
+  window.localStorage.removeItem("dirty_rows");
+  window.localStorage.removeItem("score");
+}
