@@ -62,3 +62,52 @@ p {
 	top: 40vh;
 	left: center;
 }
+#scoreboard { 
+  position: absolute; 
+  background: rgba(0,0,0,0.3); 
+  border-radius: 0.3em; 
+  visibility:hidden; 
+  overflow:hidden; 
+  max-height:0; 
+  opacity:0; 
+  transition:opacity .2s ease-in,max-height .4s ease-in
+  } 
+
+#scoreboard.opened { 
+  opacity: 1; 
+  visibility: visible;
+  max-height: 1000px 
+  
+}
+/* webxdc-scores.js styles */ 
+.score-row { 
+  text-align: left;
+  padding: 5px 10px;
+  margin: 1% 6%; 
+  border-radius: 0.3em;
+  color: rgb(255,255,220);
+  font-weight: bold;
+  } 
+  
+.score-row.you { 
+  color: #222;
+  background: rgb(255,255,220); 
+} 
+
+.row-pos {
+  float: left; 
+  color: #595959;
+  } 
+  
+.row-score {
+  float: right; 
+  display: inline-block;
+  } 
+  
+.row-name { 
+  text-overflow: ellipsis; 
+  display: inline-block; 
+  width: 65%; 
+  overflow: hidden; 
+  white-space: nowrap; 
+}
