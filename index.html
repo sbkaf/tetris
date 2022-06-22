@@ -7,13 +7,14 @@
 		<title>Tetris</title>
 		<script src="webxdc.js"></script>
 	</head>
-	<body onclick="start()">
+	<body>
 		<div class="app" id="touch">
 			<center>
 				<canvas id="background" width="1000" height="2000"></canvas>
 				<canvas id="playfield" width="1000" height="2000"></canvas>
 				<div id="scoreboard"></div>
-				<div class="UI">			
+				<!--
+				<div class="UI" style="display:None">			
 					<button onclick="move(-1, playfield, falling, true)">&larr;</button>
 					<button onclick="rotate(playfield, falling, true)">&#8635;</button>
 					<button onclick="move(1, playfield, falling, true)">&rarr;</button>
@@ -21,6 +22,7 @@
 					<br>
 					<button onclick="fall(playfield, falling, true)">&darr;</button>
 				</div>
+				-->
 			</center>
 		</div>
 		<div class="hidden">
@@ -41,6 +43,9 @@
     });
     window.addEventListener("resize", function() {
       setup();
+    });
+    window.addEventListener("click", function() {
+      start();
     });
     let portrait = window.matchMedia("(orientation: portrait)");
     portrait.addEventListener("change", function() { 
