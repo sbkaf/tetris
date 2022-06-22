@@ -74,13 +74,13 @@ const incScore = function(amount){
      if (newlevel!=level){
         level = newlevel;
         window.highscores.setScore(score);
-        clearInterval(game_interval);
-        started = false;
-        scoreboard.classList.add("opened");
+        //clearInterval(game_interval);
+        //started = false;
+        //scoreboard.classList.add("opened");
         if (level>1) {
            speed = 450 - 25*(level-1);
-           //clearInterval(game_interval);
-           //game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+           clearInterval(game_interval);
+           game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
         }
      }
 }
