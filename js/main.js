@@ -102,14 +102,14 @@ const draw = function(){
 	if (dirty){
 		rePaint(false);
 		dirty = false;
-		main.font = 'bold 28px Arial';
+		main.font = 'bold 34px Arial';
 		main.fillStyle = "rgb(255,255,255)";
 	  main.fillText("Score: "+score,20,50);
 	  main.fillText("Level: "+level,20,100);
 	  if (!started){
-	     main.font = 'bold 30px Arial';
-		   main.fillStyle = "rgb(255,255,255)";
-		   main.fillText("Touch anywhere to start",width/2-150,200);
+	     //main.font = 'bold 30px Arial';
+		   //main.fillStyle = "rgb(255,255,255)";
+		   //main.fillText("Touch anywhere to start",width/2-150,200);
 		   //var scores = window.highscores.getHighScores();
 		   if (scoreboard.innerHTML) scoreboard.classList.add("opened");
 		   //if (scores.length>0)
@@ -254,6 +254,56 @@ const spawn = function(type){
 			falling.color = "red";
 			falling.width = 3;
 			break;
+		case "-":
+			falling.shape = [[	[0, 0],
+								[8, 8]],
+							[	[8, 0],
+								[8, 0]],
+							[	[8, 8],
+								[0, 0]],
+							[	[0, 8],
+								[0, 8]]];
+			falling.rot = 0;
+			falling.loc = [0, 4];
+			falling.color = "magenta";
+			falling.width = 2;
+			break;
+		case "~":
+			falling.shape = [[	[9, 0, 0],
+								[9, 9, 9],
+								[0, 0, 9]],
+							[	[0, 9, 9],
+								[0, 9, 0],
+								[9, 9, 0]],
+							[	[9, 0, 0],
+								[9, 9, 9],
+								[0, 0, 9]],
+							[	[0, 9, 9],
+								[0, 9, 0],
+								[9, 9, 0]]];
+			falling.rot = 0;
+			falling.loc = [0, 3];
+			falling.color = "pink";
+			falling.width = 3;
+			break;
+		case "+":
+			falling.shape = [[	[0, 10, 0],
+								[10, 10, 10],
+								[0, 10, 0]],
+							[	[0, 10, 0],
+								[10, 10, 10],
+								[0, 10, 0]],
+							[	[0, 10, 0],
+								[10, 10, 10],
+								[0, 10, 0]],
+							[	[0, 10, 0],
+								[10, 10, 10],
+								[0, 10, 0]]];
+			falling.rot = 0;
+			falling.loc = [0, 3];
+			falling.color = "gray";
+			falling.width = 3;
+			break;
 	}
 	for (var i = 0; i < falling.shape[0].length; ++i){
 		const row = falling.loc[0] + i;
@@ -285,7 +335,20 @@ const spawn = function(type){
 }
 
 var spawn_rand = function(){
-	const type = Math.random() * 7; // [0, 7) = ijlostz
+  var extra = 0;
+  if (level<5){
+    extra = 0;
+  }
+  else if(level<10){
+    extra = 1;
+  }
+  else if(level<15){
+    extra = 2;
+  }
+  else{
+    extra = 3;
+  }
+	const type = Math.random() * (7+extra); // [0, 8) = ijlostz-~+
 	if (type < 1){
 		spawn("I");
 	}
@@ -304,8 +367,17 @@ var spawn_rand = function(){
 	else if (type < 6){
 		spawn("T");
 	}
-	else{
+	else if (type < 7){
 		spawn("Z");
+	}
+	else if (type < 8){
+		spawn("-");
+	}
+	else if (type < 9){
+		spawn("~");
+	}
+	else{
+		spawn("+");
 	}
 }
 
@@ -491,7 +563,7 @@ const start = function(){
 		  started = true;
 	  }
 	} else {
-   rotate(playfield, falling, true)
+   rotate(playfield, falling, true);
 	}
 }
 
@@ -524,6 +596,15 @@ const rePaint = function(refresh){
 							case(7): // red
 							main.fillStyle = "rgba(255, 0, 0, 0.65)"
 							break;
+							case(8): // magenta
+							main.fillStyle = "rgba(255, 110, 200, 0.65)"
+							break;
+							case(9): // pink
+							main.fillStyle = "rgba(255, 192, 203, 0.65)"
+							break;
+							case(10): // gray
+							main.fillStyle = "rgba(200, 200, 200, 0.65)"
+							break;
 						}
 						main.fillRect(j*100, i*100, 100, 100);
 					}
@@ -546,10 +627,7 @@ const restoreGame = function(){
   falling = JSON.parse(window.localStorage.getItem("falling"));
   dirty_rows = JSON.parse(window.localStorage.getItem("dirty_rows"));
   score = Number(window.localStorage.getItem("score"));
-  if(score>199)
-    level = Math.floor(score/100)
-  else
-    level = 1;
+  level = Math.floor((score+100)/100);
   speed = 450 - 25*(level-1);
   dirty = true;
   rePaint(true);
