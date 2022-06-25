@@ -17,16 +17,6 @@ const canvas = document.getElementById("playfield");
 const scoreboard = document.getElementById("scoreboard");
 const tip = document.getElementById("tip");
 const width = canvas.width, height = canvas.height, main = canvas.getContext("2d"), bg = document.getElementById("background").getContext("2d");
-const setup = function(){
-    let boardHeight = screen.height*2/3;
-    scoreboard.style.height = boardHeight + "px";
-    scoreboard.style.top = screen.height/2 + "px";
-    let boardWidth = screen.width*4/5;
-    scoreboard.style.width = boardWidth + "px";
-    scoreboard.style.left = screen.width/2 + "px";
-    scoreboard.style.margin = (-boardHeight/2) + "px 0 0 " + (-boardWidth/2) + "px";
-}
-setup();
 
 main.fillStyle = "rgba(255, 0, 0, 0.6)";
 bg.lineWidth = 5;
@@ -121,7 +111,7 @@ const draw = function(){
 	    //main.fillStyle = "rgb(255,255,255)";
 	    //main.fillText("Touch anywhere to start",width/2-150,200);
 	    //var scores = window.highscores.getHighScores();
-	    if (scoreboard.innerHTML) scoreboard.classList.add("opened");
+	    scoreboard.classList.add("opened");
 	    //if (scores.length>0)
 	    //   main.fillText("Scoreboard",width/2-100,300);
 	    //for(var x=0; x<scores.length; x++){

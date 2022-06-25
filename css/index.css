@@ -27,6 +27,15 @@ canvas {
     z-index: -1;
 }
 
+#game {
+    display: inline-block;
+    position: relative;
+}
+
+.center {
+    text-align: center;
+}
+
 .hidden {
     display: none;
 }
@@ -65,21 +74,25 @@ p {
 }
 #scoreboard {
     position: absolute;
+    top: 15%;
+    left: 5%;
+    width: 90%;
+    font-weight: bold;
     background: rgba(0,0,0,0.3);
     border-radius: 0.3em;
-    visibility:hidden;
-    overflow:hidden;
-    max-height:0;
-    opacity:0;
-    transition:opacity .2s ease-in,max-height .4s ease-in
+    visibility: hidden;
+    overflow: auto;
+    max-height: 0;
+    opacity: 0;
+    transition: opacity .2s ease-in,max-height .4s ease-in
 }
 
 #scoreboard.opened {
     opacity: 1;
     visibility: visible;
-    max-height: 1000px
-
+    max-height: 70%;
 }
+
 /* webxdc-scores.js styles */
 .score-row {
     text-align: left;
