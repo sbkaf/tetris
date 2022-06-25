@@ -13,6 +13,8 @@ let playfield = new Array(22),
     dirty_rows = new Array(20),
     dirty = false;
 const canvas = document.getElementById("playfield"),
+      scoreContainer = document.getElementById("score-container"),
+      levelContainer = document.getElementById("level-container"),
       scoreboard = document.getElementById("scoreboard"),
       square_img = document.getElementById("square"),
       tip = document.getElementById("tip");
@@ -82,12 +84,12 @@ function checkClear(max) { // todo: check and clear up to max
 }
 
 function incScore(amount) {
-    score+=amount;
+    scoreContainer.innerHTML = score += amount;
     newlevel = Math.floor((score+100)/100);
-    if (newlevel!=level) {
-        level = newlevel;
+    if (newlevel !== level) {
+        levelContainer.innerHTML = level = newlevel;
         window.highscores.setScore(score);
-        if (level>1) {
+        if (level > 1) {
             speed = 450 - 25*(level-1);
             clearInterval(game_interval);
             game_interval = setInterval(() => {
@@ -101,22 +103,6 @@ function draw() {
     if (dirty) {
 	rePaint(false);
 	dirty = false;
-	main.font = 'bold 34px Arial';
-	main.fillStyle = "rgb(255,255,255)";
-	main.fillText("Score: "+score,20,50);
-	main.fillText("Level: "+level,20,100);
-	if (!started) {
-	    //main.font = 'bold 30px Arial';
-	    //main.fillStyle = "rgb(255,255,255)";
-	    //main.fillText("Touch anywhere to start",width/2-150,200);
-	    //let scores = window.highscores.getHighScores();
-	    scoreboard.classList.add("opened");
-	    //if (scores.length>0)
-	    //   main.fillText("Scoreboard",width/2-100,300);
-	    //for(let x=0; x<scores.length; x++) {
-	    //   main.fillText(scores[x].pos+". "+scores[x].name+" "+scores[x].score,width/2-100,(x*50)+350);
-	    //}
-	}
     }
     window.requestAnimationFrame(draw);
 }
@@ -314,8 +300,8 @@ function spawn(type) {
                     scoreboard.classList.add("opened");
                     tip.innerHTML="<br>Touch anywhere to start";
 		    clearGame();
-		    score = 0;
-		    level = 1;
+		    scoreContainer.innerHTML = score = 0;
+		    levelContainer.innerHTML = level = 1;
 		    speed = 450;
 		    break;
 		}
@@ -542,7 +528,7 @@ function move(x, field, piece, render) { // input x: -1, 1
 
 function start() {
     if (!started) {
-	if(window.localStorage.getItem("playfield")!=undefined) {
+	if(localStorage.playfield) {
             scoreboard.classList.remove("opened");
 	    game_interval = setInterval(()=>{
                 fall(playfield, falling, true);
@@ -622,13 +608,13 @@ function saveGame() {
 
 function restoreGame() {
     sensibility = Number(localStorage.sensibility) || 5;
+    scoreContainer.innerHTML = score = Number(localStorage.score) || 0;
+    levelContainer.innerHTML = level = Math.floor((score+100)/100);
     if (localStorage.playfield) {
         playfield = JSON.parse(localStorage.playfield);
         falling = JSON.parse(localStorage.falling);
         dirty_rows = JSON.parse(localStorage.dirty_rows);
-        score = Number(localStorage.score);
         document.getElementById("sencontrol").selectedIndex=sensibility-1;
-        level = Math.floor((score+100)/100);
         speed = 450 - 25*(level-1);
         dirty = true;
         rePaint(true);
@@ -735,9 +721,9 @@ function onKeyDown(event) {
 }
 
 window.addEventListener("load", () => {
-    setField();
     window.requestAnimationFrame(draw);
     window.highscores.init("Tetris", "scoreboard").then(() => {
+        setField();
         restoreGame();
         scoreboard.classList.add("opened");
         window.addEventListener("pointerup", start);

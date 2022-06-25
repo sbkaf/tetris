@@ -2,12 +2,13 @@ body {
     -webkit-touch-callout: none;
     -webkit-text-size-adjust: none;
     -webkit-user-select: none;
-    font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+    font-family: Arial, sans-serif;
     height:100%;
     margin:0px;
     padding:0px;
     width:100%;
     overflow: hidden;
+    color: #ffffdc;
     background-color: black;
 }
 
@@ -28,8 +29,32 @@ canvas {
 }
 
 #game {
+    margin-top: 5px;
     display: inline-block;
     position: relative;
+}
+
+#score {
+    top: 0.1em;
+    left: 0.1em;
+}
+
+#level {
+    top: 0.1em;
+    right: 0.1em;
+}
+
+.label {
+    position: absolute;
+    display: inline-block;
+    z-index: 10;
+    padding: 0.2em;
+    border-radius: 0.3em;
+    background: rgba(0,0,0,0.3);
+}
+
+.label img {
+    width: 1em;
 }
 
 .center {
@@ -47,7 +72,6 @@ canvas {
 
 .UI {
     font-weight: bold;
-    color: white;
 }
 
 button {
