@@ -13,9 +13,21 @@
 				<canvas id="background" width="1000" height="2000"></canvas>
 				<canvas id="playfield" width="1000" height="2000"></canvas>
 				<div id="scoreboard"></div>
-				<div class="UI">
-				  <br>
-				  Touch anywhere to start
+				<br>
+				<a class="UI">Gesture sensitivity: </a><select id="sencontrol">
+				  <option value="1">1</option>
+				  <option value="2">2</option>
+				  <option value="3">3</option>
+				  <option value="4" selected>4</option>
+				  <option value="5">5</option>
+				  <option value="6">6</option>
+				  <option value="7">7</option>
+				  <option value="8">8</option>
+				  <option value="9">9</option>
+				  <option value="10">10</option>
+				</select>
+				<div class="UI" id="tip">
+				  <br>Touch anywhere to start
           <!--
 					<button onclick="move(-1, playfield, falling, true)">&larr;</button>
 					<button onclick="rotate(playfield, falling, true)">&#8635;</button>
@@ -38,6 +50,7 @@
       saveGame();
     });
     window.addEventListener("load", function() {
+       eruda.init();
 		   window.highscores.init("Tetris", "scoreboard").then(() => {
        restoreGame();
        scoreboard.classList.add("opened");
@@ -46,7 +59,7 @@
     window.addEventListener("resize", function() {
       setup();
     });
-    window.addEventListener("click", function() {
+    window.addEventListener("pointerup", function() {
       start();
     });
     let portrait = window.matchMedia("(orientation: portrait)");
@@ -87,9 +100,8 @@ function handleTouchMove(evt) {
 
     var xDiff = xDown - xUp;
     var yDiff = yDown - yUp;
-    
-    var sensibility = 4;
-                                                                         
+    sensibility = Number(document.getElementById("sencontrol").value);
+
     if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
             /* right swipe */ 
         if ( xDiff > 0 ) {
@@ -112,7 +124,7 @@ function handleTouchMove(evt) {
           if(ytrigger==sensibility)
             move(1, playfield, falling, true);
         }
-        console.log(xDiff);
+        //console.log(xDiff);
     } else {
       if(yDiff<0){
         ytrigger = 0;
@@ -125,7 +137,42 @@ function handleTouchMove(evt) {
           fall(playfield, falling, true);
       }
     }
-}    
+}
+var KeyCodes = {
+	SPACE : 32,
+	ARROWL: 37,
+	ARROWR: 39,
+	ARROWU: 38,
+	ARROWD: 40
+};
+
+document.onkeydown = function(event) {
+	var keyCode;
+	if (event == null) {
+		keyCode = window.event.keyCode;
+	} else {
+		keyCode = event.keyCode;
+	}
+	switch (keyCode) {
+		case KeyCodes.SPACE:
+			start();
+			break;
+		case KeyCodes.ARROWD:
+		  fall(playfield, falling, true);
+		  break;
+		case KeyCodes.ARROWL:
+		  move(-1, playfield, falling, true);
+		  break;
+		case KeyCodes.ARROWR:
+		  move(1, playfield, falling, true);
+		  break;
+		case KeyCodes.ARROWU:
+		  rotate(playfield, falling, true);
+		  break;
+		default:
+			break;
+	}
+}
 		</script>
 	</body>
 </html>
