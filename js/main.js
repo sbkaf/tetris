@@ -1,6 +1,10 @@
 /**
  * Primary JavaScript code for the actual Tetris game, including background animation.
  */
+import "../css/index.css"
+
+import "./webxdc-scores.js"
+import {Noise} from "./noise.js"
 
 var game_interval = 0;
 var score = 0;
@@ -651,4 +655,134 @@ const clearGame = function(){
     window.localStorage.removeItem("dirty_rows");
     window.localStorage.removeItem("score");
     window.localStorage.removeItem("sensibility");
+}
+
+
+/*****************************************************/
+
+document.addEventListener("visibilitychange", function() {
+    saveGame();
+});
+window.addEventListener("load", function() {
+    window.highscores.init("Tetris", "scoreboard").then(() => {
+        restoreGame();
+        scoreboard.classList.add("opened");
+    });
+});
+window.addEventListener("resize", function() {
+    setup();
+});
+window.addEventListener("pointerup", function() {
+    start();
+});
+let portrait = window.matchMedia("(orientation: portrait)");
+portrait.addEventListener("change", function() {
+    setup();
+});
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchmove', handleTouchMove, false);
+
+var xDown = null;
+var yDown = null;
+
+var xtrigger = 0;
+var ytrigger = 0;
+var dtrigger = 0;
+
+function getTouches(evt) {
+    return evt.touches ||             // browser API
+        evt.originalEvent.touches; // jQuery
+}
+
+function handleTouchStart(evt) {
+    const firstTouch = getTouches(evt)[0];
+    xDown = firstTouch.clientX;
+    yDown = firstTouch.clientY;
+    xtrigger = 0;
+    ytrigger = 0;
+    dtrigger = 0;
+};
+
+function handleTouchMove(evt) {
+    if ( ! xDown || ! yDown || ! started) {
+        return;
+    }
+
+    var xUp = evt.touches[0].clientX;
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+    sensibility = Number(document.getElementById("sencontrol").value);
+
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+        /* right swipe */
+        if ( xDiff > 0 ) {
+            ytrigger = 0;
+            dtrigger = 0;
+            if(xtrigger<sensibility)
+                xtrigger++
+            else
+                xtrigger=0;
+            if(xtrigger==sensibility)
+                move(-1, playfield, falling, true);
+        } else {
+            /* left swipe */
+            xtrigger = 0;
+            dtrigger = 0;
+            if(ytrigger<sensibility)
+                ytrigger++
+            else
+                ytrigger=0;
+            if(ytrigger==sensibility)
+                move(1, playfield, falling, true);
+        }
+        //console.log(xDiff);
+    } else {
+        if(yDiff<0){
+            ytrigger = 0;
+            xtrigger = 0;
+            if(dtrigger<sensibility)
+                dtrigger++
+            else
+                dtrigger=0;
+            if(dtrigger==sensibility)
+                fall(playfield, falling, true);
+        }
+    }
+}
+var KeyCodes = {
+    SPACE : 32,
+    ARROWL: 37,
+    ARROWR: 39,
+    ARROWU: 38,
+    ARROWD: 40
+};
+
+document.onkeydown = function(event) {
+    var keyCode;
+    if (event == null) {
+	keyCode = window.event.keyCode;
+    } else {
+	keyCode = event.keyCode;
+    }
+    switch (keyCode) {
+    case KeyCodes.SPACE:
+	start();
+	break;
+    case KeyCodes.ARROWD:
+	fall(playfield, falling, true);
+	break;
+    case KeyCodes.ARROWL:
+	move(-1, playfield, falling, true);
+	break;
+    case KeyCodes.ARROWR:
+	move(1, playfield, falling, true);
+	break;
+    case KeyCodes.ARROWU:
+	rotate(playfield, falling, true);
+	break;
+    default:
+	break;
+    }
 }

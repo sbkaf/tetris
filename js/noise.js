@@ -5,7 +5,7 @@
  * complexities.
  */
 
-function Noise(c) {
+export function Noise(c) {
     this.complexity = c;
     this.noise = new Array(this.complexity);
     this.initialize = function() {
