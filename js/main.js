@@ -3,9 +3,11 @@ var score = 0;
 var level = 1;
 var newlevel = 1;
 var speed = 450;
+var sensibility = 4;
 
 const canvas = document.getElementById("playfield");
 const scoreboard = document.getElementById("scoreboard");
+const tip = document.getElementById("tip");
 const width = canvas.width, height = canvas.height, main = canvas.getContext("2d"), bg = document.getElementById("background").getContext("2d");
 const setup = function(){
   let boardHeight = screen.height*2/3; 
@@ -316,6 +318,7 @@ const spawn = function(type){
 					set_field();
 					window.highscores.setScore(score);
           scoreboard.classList.add("opened");
+          tip.innerHTML="<br>Touch anywhere to start";
 					clearGame();
 					score = 0;
 					level = 1;
@@ -562,6 +565,7 @@ const start = function(){
 		  game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
 		  started = true;
 	  }
+	  tip.innerHTML="";
 	} else {
    rotate(playfield, falling, true);
 	}
@@ -619,6 +623,7 @@ const saveGame = function(){
   window.localStorage.setItem("falling", JSON.stringify(falling));
   window.localStorage.setItem("dirty_rows", JSON.stringify(dirty_rows));
   window.localStorage.setItem("score", score);
+  window.localStorage.setItem("sensibility", document.getElementById("sencontrol").selectedIndex+1);
 }
 
 const restoreGame = function(){
@@ -627,6 +632,8 @@ const restoreGame = function(){
   falling = JSON.parse(window.localStorage.getItem("falling"));
   dirty_rows = JSON.parse(window.localStorage.getItem("dirty_rows"));
   score = Number(window.localStorage.getItem("score"));
+  sensibility = Number(window.localStorage.getItem("sensibility"));
+  document.getElementById("sencontrol").selectedIndex=sensibility-1;
   level = Math.floor((score+100)/100);
   speed = 450 - 25*(level-1);
   dirty = true;
@@ -639,4 +646,5 @@ const clearGame = function(){
   window.localStorage.removeItem("falling");
   window.localStorage.removeItem("dirty_rows");
   window.localStorage.removeItem("score");
+  window.localStorage.removeItem("sensibility");
 }
