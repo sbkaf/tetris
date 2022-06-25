@@ -7,7 +7,7 @@ let game_interval = 0,
     level = 1,
     newlevel = 1,
     speed = 450,
-    sensibility = 4,
+    sensibility = 5,
     started = false;
 let playfield = new Array(22),
     dirty_rows = new Array(20),
@@ -87,9 +87,6 @@ function incScore(amount) {
     if (newlevel!=level) {
         level = newlevel;
         window.highscores.setScore(score);
-        //clearInterval(game_interval);
-        //started = false;
-        //scoreboard.classList.add("opened");
         if (level>1) {
             speed = 450 - 25*(level-1);
             clearInterval(game_interval);
@@ -614,20 +611,22 @@ function rePaint(refresh) {
 }
 
 function saveGame() {
-    window.localStorage.setItem("playfield", JSON.stringify(playfield));
-    window.localStorage.setItem("falling", JSON.stringify(falling));
-    window.localStorage.setItem("dirty_rows", JSON.stringify(dirty_rows));
-    window.localStorage.setItem("score", score);
-    window.localStorage.setItem("sensibility", document.getElementById("sencontrol").selectedIndex+1);
+    localStorage.sensibility = document.getElementById("sencontrol").selectedIndex+1;
+    if (started) {
+        localStorage.playfield = JSON.stringify(playfield);
+        localStorage.falling = JSON.stringify(falling);
+        localStorage.dirty_rows = JSON.stringify(dirty_rows);
+        localStorage.score = score;
+    }
 }
 
 function restoreGame() {
-    if(window.localStorage.getItem("playfield")!=undefined) {
-        playfield = JSON.parse(window.localStorage.getItem("playfield"));
-        falling = JSON.parse(window.localStorage.getItem("falling"));
-        dirty_rows = JSON.parse(window.localStorage.getItem("dirty_rows"));
-        score = Number(window.localStorage.getItem("score"));
-        sensibility = Number(window.localStorage.getItem("sensibility"));
+    sensibility = Number(localStorage.sensibility) || 5;
+    if (localStorage.playfield) {
+        playfield = JSON.parse(localStorage.playfield);
+        falling = JSON.parse(localStorage.falling);
+        dirty_rows = JSON.parse(localStorage.dirty_rows);
+        score = Number(localStorage.score);
         document.getElementById("sencontrol").selectedIndex=sensibility-1;
         level = Math.floor((score+100)/100);
         speed = 450 - 25*(level-1);
@@ -637,11 +636,10 @@ function restoreGame() {
 }
 
 function clearGame() {
-    window.localStorage.removeItem("playfield");
-    window.localStorage.removeItem("falling");
-    window.localStorage.removeItem("dirty_rows");
-    window.localStorage.removeItem("score");
-    window.localStorage.removeItem("sensibility");
+    localStorage.removeItem("playfield");
+    localStorage.removeItem("falling");
+    localStorage.removeItem("dirty_rows");
+    localStorage.removeItem("score");
 }
 
 function getTouches(evt) {
@@ -659,7 +657,7 @@ function handleTouchStart(evt) {
 };
 
 function handleTouchMove(evt) {
-    if ( ! xDown || ! yDown || ! started) {
+    if ( !xDown || !yDown || !started) {
         return;
     }
 
