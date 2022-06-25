@@ -712,24 +712,25 @@ function onKeyDown(event) {
     } else {
 	keyCode = event.keyCode;
     }
-    switch (keyCode) {
-    case KeyCodes.SPACE:
+    if (keyCode === KeyCodes.SPACE) {
 	start();
-	break;
-    case KeyCodes.ARROWD:
-	fall(playfield, falling, true);
-	break;
-    case KeyCodes.ARROWL:
-	move(-1, playfield, falling, true);
-	break;
-    case KeyCodes.ARROWR:
-	move(1, playfield, falling, true);
-	break;
-    case KeyCodes.ARROWU:
-	rotate(playfield, falling, true);
-	break;
-    default:
-	break;
+    } else if (started) {
+        switch (keyCode) {
+        case KeyCodes.ARROWD:
+	    fall(playfield, falling, true);
+	    break;
+        case KeyCodes.ARROWL:
+	    move(-1, playfield, falling, true);
+	    break;
+        case KeyCodes.ARROWR:
+	    move(1, playfield, falling, true);
+	    break;
+        case KeyCodes.ARROWU:
+	    rotate(playfield, falling, true);
+	    break;
+        default:
+	    break;
+        }
     }
 }
 
