@@ -720,6 +720,12 @@ function onKeyDown(event) {
     }
 }
 
+function pauseGame() {
+   clearInterval(game_interval);
+   started = false;
+   tip.innerHTML = "<br>Touch anywhere to start";
+}
+
 window.addEventListener("load", () => {
     window.requestAnimationFrame(draw);
     window.highscores.init("Tetris", "scoreboard").then(() => {
@@ -731,5 +737,6 @@ window.addEventListener("load", () => {
         document.addEventListener('touchmove', handleTouchMove, false);
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener("visibilitychange", saveGame);
+        document.getElementById("sencontrol").addEventListener("focusin", pauseGame);
     });
 });
