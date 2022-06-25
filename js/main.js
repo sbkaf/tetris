@@ -16,10 +16,11 @@ var sensibility = 4;
 const canvas = document.getElementById("playfield");
 const scoreboard = document.getElementById("scoreboard");
 const tip = document.getElementById("tip");
-const width = canvas.width, height = canvas.height, main = canvas.getContext("2d"), bg = document.getElementById("background").getContext("2d");
+const width = canvas.width,
+      height = canvas.height,
+      main = canvas.getContext("2d");
 
 main.fillStyle = "rgba(255, 0, 0, 0.6)";
-bg.lineWidth = 5;
 
 const square_img = document.getElementById("square");
 
@@ -85,18 +86,7 @@ const incScore = function(amount){
     }
 }
 
-const draw = function(){
-    bg.clearRect(0,0,width,height);
-    for (var i = 0; i < 10; ++i){
-	for (var j = 19; j < 40; ++j){
-	    const x = i*width/10 + 10, y = (j-20)*(height)/20 + 10;
-	    bg.strokeStyle = "rgba(" + (255*R.sample((x + 40)/width, (y + 40)/height, t)).toString() + "," + (255*G.sample((x + 40)/width, (y + 40)/height, t)).toString() + "," + (255*B.sample((x + 40)/width, (y + 40)/height, t)).toString() + "," + Math.max(Math.pow(A.sample((x + 40)/width, (y + 40)/height, t), 4), 0.1).toString() + ")";
-	    bg.strokeRect(x, y, 80, 80);
-	}
-    }
-    //bg.lineWidth = 2;
-    bg.strokeStyle = "rgba(255,255,255,0.5)";
-    bg.strokeRect(0,0,width,height);
+const draw = () => {
     t += 0.0015;
     if (t > 1){t -= 1;R.wrapz();G.wrapz();B.wrapz();A.wrapz();}
     if (dirty){
@@ -120,7 +110,7 @@ const draw = function(){
 	}
     }
     window.requestAnimationFrame(draw);
-}
+};
 
 window.requestAnimationFrame(draw);
 
@@ -659,16 +649,10 @@ window.addEventListener("load", function() {
         scoreboard.classList.add("opened");
     });
 });
-window.addEventListener("resize", function() {
-    setup();
-});
 window.addEventListener("pointerup", function() {
     start();
 });
 let portrait = window.matchMedia("(orientation: portrait)");
-portrait.addEventListener("change", function() {
-    setup();
-});
 document.addEventListener('touchstart', handleTouchStart, false);
 document.addEventListener('touchmove', handleTouchMove, false);
 

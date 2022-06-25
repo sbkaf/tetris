@@ -25,6 +25,7 @@ canvas {
 
 #playfield {
     z-index: -1;
+    border: solid 1px gray;
 }
 
 #game {
