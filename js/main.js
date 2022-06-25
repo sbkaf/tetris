@@ -1,41 +1,28 @@
-/**
- * Primary JavaScript code for the actual Tetris game, including background animation.
- */
 import "../css/index.css"
 
 import "./webxdc-scores.js"
-import {Noise} from "./noise.js"
 
-var game_interval = 0;
-var score = 0;
-var level = 1;
-var newlevel = 1;
-var speed = 450;
-var sensibility = 4;
+let game_interval = 0,
+    score = 0,
+    level = 1,
+    newlevel = 1,
+    speed = 450,
+    sensibility = 4,
+    started = false;
+let playfield = new Array(22),
+    dirty_rows = new Array(20),
+    dirty = false;
+const canvas = document.getElementById("playfield"),
+      scoreboard = document.getElementById("scoreboard"),
+      square_img = document.getElementById("square"),
+      tip = document.getElementById("tip");
 
-const canvas = document.getElementById("playfield");
-const scoreboard = document.getElementById("scoreboard");
-const tip = document.getElementById("tip");
 const width = canvas.width,
       height = canvas.height,
       main = canvas.getContext("2d");
-
 main.fillStyle = "rgba(255, 0, 0, 0.6)";
 
-const square_img = document.getElementById("square");
-
-var playfield = new Array(22), dirty_rows = new Array(20), dirty = false, t = 0;
-
-const set_field = function(){
-    for (let i = 0; i < playfield.length; ++i){ playfield[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];}
-    for (let i = 0; i < dirty_rows.length; ++i){ dirty_rows[i] = true;}
-    dirty = true;
-};
-set_field();
-
-const R = new Noise(10), G = new Noise(10), B = new Noise(10), A = new Noise(10);
-
-var falling = {
+let falling = {
     shape: [],
     rot: 0,
     loc: [],
@@ -43,8 +30,33 @@ var falling = {
     width: 0
 };
 
-const check_clear = function(max){ // todo: check and clear up to max
-    for (var row = 0; row <= max && row < playfield.length; ++row){
+let xDown = null;
+let yDown = null;
+
+let xtrigger = 0;
+let ytrigger = 0;
+let dtrigger = 0;
+
+let KeyCodes = {
+    SPACE : 32,
+    ARROWL: 37,
+    ARROWR: 39,
+    ARROWU: 38,
+    ARROWD: 40
+};
+
+function setField() {
+    for (let i = 0; i < playfield.length; ++i) {
+        playfield[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    }
+    for (let i = 0; i < dirty_rows.length; ++i) {
+        dirty_rows[i] = true;
+    }
+    dirty = true;
+}
+
+function checkClear(max) { // todo: check and clear up to max
+    for (let row = 0; row <= max && row < playfield.length; ++row) {
 	if (playfield[row][0] > 0 &&
 	    playfield[row][1] > 0 &&
 	    playfield[row][2] > 0 &&
@@ -54,11 +66,11 @@ const check_clear = function(max){ // todo: check and clear up to max
 	    playfield[row][6] > 0 &&
 	    playfield[row][7] > 0 &&
 	    playfield[row][8] > 0 &&
-	    playfield[row][9] > 0){
+	    playfield[row][9] > 0) {
 	    playfield.splice(row, 1);
 	    playfield.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-	    for (var i = 0; i <= row; ++i){
-		if (i > 1 && !dirty_rows[i-2]){
+	    for (let i = 0; i <= row; ++i) {
+		if (i > 1 && !dirty_rows[i-2]) {
 		    dirty_rows[i-2] = true;
 		    if (!dirty) dirty = true;
 		    incScore(1);
@@ -69,10 +81,10 @@ const check_clear = function(max){ // todo: check and clear up to max
     }
 }
 
-const incScore = function(amount){
+function incScore(amount) {
     score+=amount;
     newlevel = Math.floor((score+100)/100);
-    if (newlevel!=level){
+    if (newlevel!=level) {
         level = newlevel;
         window.highscores.setScore(score);
         //clearInterval(game_interval);
@@ -81,42 +93,39 @@ const incScore = function(amount){
         if (level>1) {
             speed = 450 - 25*(level-1);
             clearInterval(game_interval);
-            game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+            game_interval = setInterval(() => {
+                fall(playfield, falling, true);
+            }, speed);
         }
     }
 }
 
-const draw = () => {
-    t += 0.0015;
-    if (t > 1){t -= 1;R.wrapz();G.wrapz();B.wrapz();A.wrapz();}
-    if (dirty){
+function draw() {
+    if (dirty) {
 	rePaint(false);
 	dirty = false;
 	main.font = 'bold 34px Arial';
 	main.fillStyle = "rgb(255,255,255)";
 	main.fillText("Score: "+score,20,50);
 	main.fillText("Level: "+level,20,100);
-	if (!started){
+	if (!started) {
 	    //main.font = 'bold 30px Arial';
 	    //main.fillStyle = "rgb(255,255,255)";
 	    //main.fillText("Touch anywhere to start",width/2-150,200);
-	    //var scores = window.highscores.getHighScores();
+	    //let scores = window.highscores.getHighScores();
 	    scoreboard.classList.add("opened");
 	    //if (scores.length>0)
 	    //   main.fillText("Scoreboard",width/2-100,300);
-	    //for(var x=0; x<scores.length; x++){
+	    //for(let x=0; x<scores.length; x++) {
 	    //   main.fillText(scores[x].pos+". "+scores[x].name+" "+scores[x].score,width/2-100,(x*50)+350);
 	    //}
 	}
     }
     window.requestAnimationFrame(draw);
-};
+}
 
-window.requestAnimationFrame(draw);
-
-
-const spawn = function(type){
-    switch (type){
+function spawn(type) {
+    switch (type) {
     case "I":
 	falling.shape = [[	[0, 0, 0, 0],
 				[1, 1, 1, 1],
@@ -295,15 +304,15 @@ const spawn = function(type){
 	falling.width = 3;
 	break;
     }
-    for (var i = 0; i < falling.shape[0].length; ++i){
+    for (let i = 0; i < falling.shape[0].length; ++i) {
 	const row = falling.loc[0] + i;
-	for (var j = 0; j < falling.shape[0][i].length; ++j){
+	for (let j = 0; j < falling.shape[0][i].length; ++j) {
 	    const col = falling.loc[1] + j;
-	    if (falling.shape[0][i][j] > 0){
-		if (playfield[row][col] > 0){
+	    if (falling.shape[0][i][j] > 0) {
+		if (playfield[row][col] > 0) {
 		    clearInterval(game_interval);
 		    started = false;
-		    set_field();
+		    setField();
 		    window.highscores.setScore(score);
                     scoreboard.classList.add("opened");
                     tip.innerHTML="<br>Touch anywhere to start";
@@ -313,9 +322,9 @@ const spawn = function(type){
 		    speed = 450;
 		    break;
 		}
-		else if (falling.shape[0][i][j] > 0){
+		else if (falling.shape[0][i][j] > 0) {
 		    playfield[row][col] = falling.shape[0][i][j];
-		    if (row > 1 && !dirty_rows[row - 2]){
+		    if (row > 1 && !dirty_rows[row - 2]) {
 			dirty_rows[row - 2] = true;
 			dirty = true;
 		    }
@@ -325,46 +334,46 @@ const spawn = function(type){
     }
 }
 
-var spawn_rand = function(){
-    var extra = 0;
-    if (level<5){
+function spawn_rand() {
+    let extra = 0;
+    if (level<5) {
         extra = 0;
     }
-    else if(level<10){
+    else if(level<10) {
         extra = 1;
     }
-    else if(level<15){
+    else if(level<15) {
         extra = 2;
     }
     else{
         extra = 3;
     }
     const type = Math.random() * (7+extra); // [0, 8) = ijlostz-~+
-    if (type < 1){
+    if (type < 1) {
 	spawn("I");
     }
-    else if (type < 2){
+    else if (type < 2) {
 	spawn("J");
     }
-    else if (type < 3){
+    else if (type < 3) {
 	spawn("L");
     }
-    else if (type < 4){
+    else if (type < 4) {
 	spawn("O");
     }
-    else if (type < 5){
+    else if (type < 5) {
 	spawn("S");
     }
-    else if (type < 6){
+    else if (type < 6) {
 	spawn("T");
     }
-    else if (type < 7){
+    else if (type < 7) {
 	spawn("Z");
     }
-    else if (type < 8){
+    else if (type < 8) {
 	spawn("-");
     }
-    else if (type < 9){
+    else if (type < 9) {
 	spawn("~");
     }
     else{
@@ -372,25 +381,19 @@ var spawn_rand = function(){
     }
 }
 
-var test = function(row, col){
-    dirty_rows[row] = true;
-    playfield[row+2][col] = 1;
-    dirty = true;
-}
-
-var fall = function(field, piece, render){
+function fall(field, piece, render) {
     if (piece.shape.length != 4) return;
-    var valid = true;
-    for (var i = 0; i < piece.shape[piece.rot].length; ++i){
+    let valid = true;
+    for (let i = 0; i < piece.shape[piece.rot].length; ++i) {
 	const row = piece.loc[0] + i;
-	for (var j = 0; j < piece.shape[piece.rot][i].length; ++j){
+	for (let j = 0; j < piece.shape[piece.rot][i].length; ++j) {
 	    const col = piece.loc[1] + j;
-	    if (col < 0 || col > 9){
+	    if (col < 0 || col > 9) {
 		continue;
 	    }
-	    if (piece.shape[piece.rot][i][j] > 0){
+	    if (piece.shape[piece.rot][i][j] > 0) {
 		if (!((i+1 < piece.shape[piece.rot].length && piece.shape[piece.rot][i+1][j] > 0) ||
-		      (row+1 < field.length && field[row+1][col] == 0))){
+		      (row+1 < field.length && field[row+1][col] == 0))) {
 		    valid = false;
 		    piece.shape = [];
 		    break;
@@ -399,21 +402,21 @@ var fall = function(field, piece, render){
 	}
 	if (!valid) break;
     }
-    if (valid){
-	for (var i = piece.shape[piece.rot].length-1; i >= 0; i--){
+    if (valid) {
+	for (let i = piece.shape[piece.rot].length-1; i >= 0; i--) {
 	    const row = piece.loc[0] + i;
-	    for (var j = 0; j < piece.shape[piece.rot][i].length; ++j){
+	    for (let j = 0; j < piece.shape[piece.rot][i].length; ++j) {
 		const col = piece.loc[1] + j;
-		if (col < 0 || col > 9){
+		if (col < 0 || col > 9) {
 		    continue;
 		}
-		if (piece.shape[piece.rot][i][j] > 0){
+		if (piece.shape[piece.rot][i][j] > 0) {
 		    field[row][col] = 0;
 		    field[row+1][col] = piece.shape[piece.rot][i][j];
-		    if (render && row > 1 && !dirty_rows[row-2]){
+		    if (render && row > 1 && !dirty_rows[row-2]) {
 			dirty_rows[row - 2] = true;
 		    }
-		    if (render && row+1 > 1 && !dirty_rows[row-1]){
+		    if (render && row+1 > 1 && !dirty_rows[row-1]) {
 			dirty_rows[row - 1] = true;
 		    }
 		}
@@ -423,34 +426,35 @@ var fall = function(field, piece, render){
 	if (render) dirty = true;
     }
     else{
-	check_clear(piece.loc[0] + piece.width - 1);
+	checkClear(piece.loc[0] + piece.width - 1);
 	spawn_rand();
     }
     return valid;
 }
 
 // rot 90deg clockwise
-const rotate = function(field, piece, render){
+function rotate(field, piece, render) {
     if (piece.shape.length != 4) return;
-    var rot = 1;
-    while (rot < 4){
-	var check = piece.rot + rot;
+    let rot = 1;
+    let check;
+    while (rot < 4) {
+	check = piece.rot + rot;
 	if (check > 3) check -= 4;
-	var valid = true;
-	for (var i = 0; i < piece.width; ++i){
+	let valid = true;
+	for (let i = 0; i < piece.width; ++i) {
 	    const row = piece.loc[0] + i;
-	    for (var j = 0; j < piece.width; ++j){
-		if (piece.shape[check][i][j] > 0){
+	    for (let j = 0; j < piece.width; ++j) {
+		if (piece.shape[check][i][j] > 0) {
 		    const col = piece.loc[1] + j;
-		    if ((row >= field.length)){
+		    if ((row >= field.length)) {
 			valid = false;
 			break;
 		    }
-		    if (col < 0 || col > 9){
+		    if (col < 0 || col > 9) {
 			valid = false;
 			break;
 		    }
-		    if (piece.shape[piece.rot][i][j] == 0 && row < field.length && field[row][col] > 0){
+		    if (piece.shape[piece.rot][i][j] == 0 && row < field.length && field[row][col] > 0) {
 			valid = false;
 			break;
 		    }
@@ -461,23 +465,23 @@ const rotate = function(field, piece, render){
 	if (!valid) rot++;
 	else break;
     }
-    if (rot < 4){
-	for (var i = 0; i < piece.width; ++i){
+    if (rot < 4) {
+	for (let i = 0; i < piece.width; ++i) {
 	    const row = piece.loc[0] + i;
-	    for (var j = 0; j < piece.width; ++j){
+	    for (let j = 0; j < piece.width; ++j) {
 		const col = piece.loc[1] + j;
-		if (col < 0 || col > 9){
+		if (col < 0 || col > 9) {
 		    continue;
 		}
-		if (piece.shape[piece.rot][i][j] > 0 && piece.shape[check][i][j] == 0){
+		if (piece.shape[piece.rot][i][j] > 0 && piece.shape[check][i][j] == 0) {
 		    field[row][col] = 0;
-		    if (render && row > 1 && !dirty_rows[row-2]){
+		    if (render && row > 1 && !dirty_rows[row-2]) {
 			dirty_rows[row - 2] = true;
 		    }
 		}
-		else if (field[row][col] == 0 && piece.shape[check][i][j] > 0){
+		else if (field[row][col] == 0 && piece.shape[check][i][j] > 0) {
 		    field[row][col] = piece.shape[check][i][j];
-		    if (render && row > 1 && !dirty_rows[row-2]){
+		    if (render && row > 1 && !dirty_rows[row-2]) {
 			dirty_rows[row - 2] = true;
 		    }
 		}
@@ -489,21 +493,21 @@ const rotate = function(field, piece, render){
     return rot < 4;
 }
 
-const move = function(x, field, piece, render){ // input x: -1, 1
+function move(x, field, piece, render) { // input x: -1, 1
     if (piece.shape.length != 4) return;
-    var valid = true;
-    for (var i = 0; i < piece.width; ++i){
+    let valid = true;
+    for (let i = 0; i < piece.width; ++i) {
 	const row = piece.loc[0] + i;
-	for (var j = 0; j < piece.width; ++j){
-	    if (piece.shape[piece.rot][i][j] > 0){
+	for (let j = 0; j < piece.width; ++j) {
+	    if (piece.shape[piece.rot][i][j] > 0) {
 		const col = piece.loc[1] + j + x;
-		if (col < 0 || col > 9){
+		if (col < 0 || col > 9) {
 		    valid = false;
 		    break;
 		}
-		else if (field[row][col] > 0){
+		else if (field[row][col] > 0) {
 		    if ((j + x < piece.width && piece.shape[piece.rot][i][j + x] == 0) ||
-			(j + x < 0 || j + x >= piece.width)){
+			(j + x < 0 || j + x >= piece.width)) {
 			valid = false;
 			break;
 		    }
@@ -512,23 +516,23 @@ const move = function(x, field, piece, render){ // input x: -1, 1
 	}
 	if (!valid) break;
     }
-    if (valid){
-	for (var i = 0; i < piece.width; ++i){
+    if (valid) {
+	for (let i = 0; i < piece.width; ++i) {
 	    const row = piece.loc[0] + i;
-	    for (var j = 0; j < piece.width; ++j){
+	    for (let j = 0; j < piece.width; ++j) {
 		const col = piece.loc[1] + j;
-		if (piece.shape[piece.rot][i][j] > 0){
+		if (piece.shape[piece.rot][i][j] > 0) {
 		    field[row][col] =  0;
 		}
 	    }
 	}
-	for (var i = 0; i < piece.width; ++i){
+	for (let i = 0; i < piece.width; ++i) {
 	    const row = piece.loc[0] + i;
-	    for (var j = 0; j < piece.width; ++j){
+	    for (let j = 0; j < piece.width; ++j) {
 		const col = piece.loc[1] + j + x;
-		if (piece.shape[piece.rot][i][j] > 0){
+		if (piece.shape[piece.rot][i][j] > 0) {
 		    field[row][col] =  piece.shape[piece.rot][i][j];
-		    if (render && row > 1 && !dirty_rows[row - 2]){
+		    if (render && row > 1 && !dirty_rows[row - 2]) {
 			dirty_rows[row - 2] = true;
 		    }
 		}
@@ -539,18 +543,21 @@ const move = function(x, field, piece, render){ // input x: -1, 1
     }
 }
 
-var started = false;
-const start = function(){
-    if (!started){
-	if(window.localStorage.getItem("playfield")!=undefined){
+function start() {
+    if (!started) {
+	if(window.localStorage.getItem("playfield")!=undefined) {
             scoreboard.classList.remove("opened");
-	    game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+	    game_interval = setInterval(()=>{
+                fall(playfield, falling, true);
+            }, speed);
 	    started = true;
 	}
 	else {
 	    spawn_rand();
 	    scoreboard.classList.remove("opened");
-	    game_interval = setInterval(function(){fall(playfield, falling, true);}, speed);
+	    game_interval = setInterval(() => {
+                fall(playfield, falling, true);
+            }, speed);
 	    started = true;
 	}
 	tip.innerHTML="";
@@ -559,14 +566,14 @@ const start = function(){
     }
 }
 
-const rePaint = function(refresh){
-    for (var i = 0; i < 20; ++i){
-        if(dirty_rows[i] || refresh){
+function rePaint(refresh) {
+    for (let i = 0; i < 20; ++i) {
+        if(dirty_rows[i] || refresh) {
 	    main.clearRect(0, i * 100, width, 100);
-	    for (var j = 0; j < 10; ++j){
-		if (playfield[i+2][j] > 0){
+	    for (let j = 0; j < 10; ++j) {
+		if (playfield[i+2][j] > 0) {
 		    main.drawImage(square_img, j * 100, i * 100);
-		    switch(playfield[i+2][j]){ // note: static colors looks dull
+		    switch(playfield[i+2][j]) { // note: static colors looks dull
 		    case(1): // cyan
 			main.fillStyle = "rgba(0, 255, 255, 0.65)"
 			break;
@@ -606,7 +613,7 @@ const rePaint = function(refresh){
     }
 }
 
-const saveGame = function(){
+function saveGame() {
     window.localStorage.setItem("playfield", JSON.stringify(playfield));
     window.localStorage.setItem("falling", JSON.stringify(falling));
     window.localStorage.setItem("dirty_rows", JSON.stringify(dirty_rows));
@@ -614,8 +621,8 @@ const saveGame = function(){
     window.localStorage.setItem("sensibility", document.getElementById("sencontrol").selectedIndex+1);
 }
 
-const restoreGame = function(){
-    if(window.localStorage.getItem("playfield")!=undefined){
+function restoreGame() {
+    if(window.localStorage.getItem("playfield")!=undefined) {
         playfield = JSON.parse(window.localStorage.getItem("playfield"));
         falling = JSON.parse(window.localStorage.getItem("falling"));
         dirty_rows = JSON.parse(window.localStorage.getItem("dirty_rows"));
@@ -629,39 +636,13 @@ const restoreGame = function(){
     }
 }
 
-const clearGame = function(){
+function clearGame() {
     window.localStorage.removeItem("playfield");
     window.localStorage.removeItem("falling");
     window.localStorage.removeItem("dirty_rows");
     window.localStorage.removeItem("score");
     window.localStorage.removeItem("sensibility");
 }
-
-
-/*****************************************************/
-
-document.addEventListener("visibilitychange", function() {
-    saveGame();
-});
-window.addEventListener("load", function() {
-    window.highscores.init("Tetris", "scoreboard").then(() => {
-        restoreGame();
-        scoreboard.classList.add("opened");
-    });
-});
-window.addEventListener("pointerup", function() {
-    start();
-});
-let portrait = window.matchMedia("(orientation: portrait)");
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchmove', handleTouchMove, false);
-
-var xDown = null;
-var yDown = null;
-
-var xtrigger = 0;
-var ytrigger = 0;
-var dtrigger = 0;
 
 function getTouches(evt) {
     return evt.touches ||             // browser API
@@ -682,11 +663,11 @@ function handleTouchMove(evt) {
         return;
     }
 
-    var xUp = evt.touches[0].clientX;
-    var yUp = evt.touches[0].clientY;
+    let xUp = evt.touches[0].clientX;
+    let yUp = evt.touches[0].clientY;
 
-    var xDiff = xDown - xUp;
-    var yDiff = yDown - yUp;
+    let xDiff = xDown - xUp;
+    let yDiff = yDown - yUp;
     sensibility = Number(document.getElementById("sencontrol").value);
 
     if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
@@ -713,28 +694,21 @@ function handleTouchMove(evt) {
         }
         //console.log(xDiff);
     } else {
-        if(yDiff<0){
+        if (yDiff < 0) {
             ytrigger = 0;
             xtrigger = 0;
-            if(dtrigger<sensibility)
+            if (dtrigger < sensibility)
                 dtrigger++
             else
                 dtrigger=0;
-            if(dtrigger==sensibility)
+            if (dtrigger == sensibility)
                 fall(playfield, falling, true);
         }
     }
 }
-var KeyCodes = {
-    SPACE : 32,
-    ARROWL: 37,
-    ARROWR: 39,
-    ARROWU: 38,
-    ARROWD: 40
-};
 
-document.onkeydown = function(event) {
-    var keyCode;
+function onKeyDown(event) {
+    let keyCode;
     if (event == null) {
 	keyCode = window.event.keyCode;
     } else {
@@ -760,3 +734,17 @@ document.onkeydown = function(event) {
 	break;
     }
 }
+
+window.addEventListener("load", () => {
+    setField();
+    window.requestAnimationFrame(draw);
+    window.highscores.init("Tetris", "scoreboard").then(() => {
+        restoreGame();
+        scoreboard.classList.add("opened");
+        window.addEventListener("pointerup", start);
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener("visibilitychange", saveGame);
+    });
+});
