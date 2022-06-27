@@ -722,7 +722,7 @@ function onKeyDown(event) {
 
 function pauseGame() {
    clearInterval(game_interval);
-   started = false;
+   //started = false;
    tip.innerHTML = "<br>Touch anywhere to start";
 }
 
