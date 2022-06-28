@@ -1,5 +1,3 @@
-import "../css/index.css"
-
 import "./webxdc-scores.js"
 
 let game_interval = 0,

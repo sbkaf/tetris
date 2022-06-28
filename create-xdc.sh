@@ -9,12 +9,13 @@ case "$1" in
         PACKAGE_NAME=${PWD##*/} # '##*/' removes everything before the last slash and the last slash
         ;;
     *)
-        PACKAGE_NAME=${1%.xdc} # '%.xdc' removes the extension and allows PACKAGE_NAME to be given with or without extension
+        PACKAGE_NAME=$1
         ;;
 esac
 
+PACKAGE_NAME=${PACKAGE_NAME%.xdc} # '%.xdc' removes the extension and allows PACKAGE_NAME to be given with or without extension
 rm "$PACKAGE_NAME.xdc" 2> /dev/null
-zip -9 --recurse-paths "$PACKAGE_NAME.xdc" * --exclude README.md webxdc.js webxdc.d.ts "*.sh" "*.xdc"
+zip -9 --recurse-paths "$PACKAGE_NAME.xdc" css img js icon.png index.html manifest.toml --exclude "*~"
 
 echo "success, archive contents:"
 unzip -l "$PACKAGE_NAME.xdc"
