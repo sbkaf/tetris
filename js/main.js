@@ -6,7 +6,8 @@ let game_interval = 0,
     newlevel = 1,
     speed = 450,
     sensibility = 5,
-    started = false;
+    started = false,
+    paused = false;
 let playfield = new Array(22),
     dirty_rows = new Array(20),
     dirty = false;
@@ -363,6 +364,7 @@ function spawn_rand() {
 }
 
 function fall(field, piece, render) {
+    if (paused) return;
     if (piece.shape.length != 4) return;
     let valid = true;
     for (let i = 0; i < piece.shape[piece.rot].length; ++i) {
@@ -541,10 +543,12 @@ function start() {
             }, speed);
 	    started = true;
 	}
-	tip.innerHTML="";
     } else {
-        rotate(playfield, falling, true);
+        if(!paused)
+          rotate(playfield, falling, true);
     }
+    paused = false;
+    tip.innerHTML="";
 }
 
 function rePaint(refresh) {
@@ -719,8 +723,7 @@ function onKeyDown(event) {
 }
 
 function pauseGame() {
-   clearInterval(game_interval);
-   //started = false;
+   paused = true;
    tip.innerHTML = "<br>Touch anywhere to start";
 }
 
