@@ -21,6 +21,7 @@ const canvas = document.getElementById("playfield"),
       scoreboard = document.getElementById("scoreboard"),
       square_img = document.getElementById("square"),
       settingsBtn = document.getElementById("settings"),
+      startBtn = document.getElementById("start"),
       gameArea = document.getElementById("game-area"),
       overlay = document.getElementById("overlay"),
       sensibilitySelect = document.getElementById("sencontrol"),
@@ -309,6 +310,8 @@ function spawn(type) {
 		    setField();
 		    window.highscores.setScore(score);
                     scoreboard.classList.add("opened");
+                    canvas.classList.add("blur");
+                    startBtn.classList.remove("hidden");
 		    clearGame();
 		    scoreContainer.innerHTML = score = 0;
 		    level = 1;
@@ -546,13 +549,11 @@ function move(x, field, piece, render) { // input x: -1, 1
 }
 
 function start() {
-    if (paused) {
-        hideMenu();
-        paused = false;
-        if (started) sfxmusic.play();
-    } else if (!started) {
+    if (!started) {
 	if (!localStorage.playfield) spawn_rand();
+        startBtn.classList.add("hidden");
         scoreboard.classList.remove("opened");
+        canvas.classList.remove("blur");
 	game_interval = setInterval(() => {
             fall(playfield, falling, true);
         }, speed);
@@ -561,7 +562,15 @@ function start() {
         if (!sfxmusic.playing()) {
             sfxmusic.play();
         }
-    } else {
+    }
+}
+
+function onClick() {
+    if (paused) {
+        hideMenu();
+        paused = false;
+        if (started) sfxmusic.play();
+    } else if (started) {
         rotate(playfield, falling, true);
     }
 }
@@ -729,7 +738,11 @@ function onKeyDown(event) {
 	keyCode = event.keyCode;
     }
     if (keyCode === KeyCodes.SPACE) {
-	start();
+        if (started || paused) {
+	    onClick();
+        } else {
+            start();
+        }
     } else if (started && !paused) {
         switch (keyCode) {
         case KeyCodes.ARROWD:
@@ -789,7 +802,17 @@ window.addEventListener("load", () => {
             event.preventDefault();
             event.stopPropagation();
         });
-        document.addEventListener("pointerup", start);
+        overlay.addEventListener("pointerup", () => {
+            event.preventDefault();
+            event.stopPropagation();
+            onClick();
+        });
+        startBtn.addEventListener("pointerup", () => {
+            event.preventDefault();
+            event.stopPropagation();
+            start();
+        });
+        document.addEventListener("pointerup", onClick);
         document.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchmove', handleTouchMove, false);
         document.addEventListener('keydown', onKeyDown);

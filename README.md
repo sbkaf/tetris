@@ -16,4 +16,4 @@ and you should be able to play the game.
 
 Based on https://github.com/Btsan/webcanvas_tetris
 
-The score/trophy and level icons are from the Carbon icons from [Iconify](https://iconify.design)
+The SVG icons are from the Carbon icons from [Iconify](https://iconify.design)

@@ -93,6 +93,17 @@ canvas {
   gap: 0.5rem;
 }
 
+#start {
+    width: 40%;
+    left: 30%;
+    bottom: 1em;
+    background: rgba(0,0,0,0.8);
+    border: solid 1px gray;
+}
+#start, #start * {
+    cursor: pointer;
+}
+
 .label {
     position: absolute;
     display: inline-block;
