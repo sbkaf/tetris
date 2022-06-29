@@ -1,4 +1,5 @@
 import "./webxdc-scores.js"
+import './howler.js';
 
 let game_interval = 0,
     score = 0,
@@ -11,6 +12,11 @@ let game_interval = 0,
 let playfield = new Array(22),
     dirty_rows = new Array(20),
     dirty = false;
+let sfxmusic,
+    sfxscore,
+    sfxcollision,
+    sfxlost,
+    sfxlevel;
 const canvas = document.getElementById("playfield"),
       scoreContainer = document.getElementById("score-container"),
       levelContainer = document.getElementById("level-container"),
@@ -95,6 +101,10 @@ function incScore(amount) {
                 fall(playfield, falling, true);
             }, speed);
         }
+        sfxlevel.play();
+    }else{
+    if(!sfxlevel.playing())
+       sfxscore.play();
     }
 }
 
@@ -302,6 +312,8 @@ function spawn(type) {
 		    scoreContainer.innerHTML = score = 0;
 		    levelContainer.innerHTML = level = 1;
 		    speed = 450;
+		    sfxlost.play();
+		    sfxmusic.pause();
 		    break;
 		}
 		else if (falling.shape[0][i][j] > 0) {
@@ -379,6 +391,7 @@ function fall(field, piece, render) {
 		      (row+1 < field.length && field[row+1][col] == 0))) {
 		    valid = false;
 		    piece.shape = [];
+		    sfxcollision.play();
 		    break;
 		}
 	    }
@@ -409,8 +422,13 @@ function fall(field, piece, render) {
 	if (render) dirty = true;
     }
     else{
+  sfxcollision.play();
 	checkClear(piece.loc[0] + piece.width - 1);
 	spawn_rand();
+  if (checkTopBlock()<8)
+     sfxmusic.rate(1.2)
+  else
+     sfxmusic.rate(1);
     }
     return valid;
 }
@@ -543,12 +561,29 @@ function start() {
             }, speed);
 	    started = true;
 	}
+	sfxmusic.rate(1);
     } else {
         if(!paused)
           rotate(playfield, falling, true);
     }
     paused = false;
     tip.innerHTML="";
+    if(!sfxmusic.playing()){
+       sfxmusic.play();
+    }
+}
+
+function checkTopBlock(){
+  var lastrow = 0;
+  for (let r = 19; r>0; r--) {
+      for(let c = 9; c>0; c--){
+         if(playfield[r+2][c]>0){
+           lastrow = r;
+         }
+      }
+  }
+  //console.log(lastrow);
+  return lastrow;
 }
 
 function rePaint(refresh) {
@@ -645,7 +680,7 @@ function handleTouchStart(evt) {
 };
 
 function handleTouchMove(evt) {
-    if ( !xDown || !yDown || !started) {
+    if ( !xDown || !yDown || !started || paused) {
         return;
     }
 
@@ -702,7 +737,7 @@ function onKeyDown(event) {
     }
     if (keyCode === KeyCodes.SPACE) {
 	start();
-    } else if (started) {
+    } else if (started && !paused) {
         switch (keyCode) {
         case KeyCodes.ARROWD:
 	    fall(playfield, falling, true);
@@ -722,10 +757,23 @@ function onKeyDown(event) {
     }
 }
 
-function pauseGame() {
+const pauseGame = (event) => {
+   event.preventDefault(); 
+   event.stopPropagation();
    paused = true;
    tip.innerHTML = "<br>Touch anywhere to start";
+   sfxmusic.pause();
+};
+
+function loadAssets() {
+  sfxmusic = new Howl({src: ["sounds/music.mp3"],loop: true, volume:0.4});
+  sfxscore = new Howl({src: ["sounds/score.mp3"],loop: false});
+  sfxcollision = new Howl({src: ["sounds/collision.mp3"],loop: false});
+  sfxlost = new Howl({src: ["sounds/lost.mp3"],loop: false});
+  sfxlevel = new Howl({src: ["sounds/level.mp3"],loop: false});
 }
+
+loadAssets();
 
 window.addEventListener("load", () => {
     window.requestAnimationFrame(draw);
@@ -733,11 +781,11 @@ window.addEventListener("load", () => {
         setField();
         restoreGame();
         scoreboard.classList.add("opened");
+        document.getElementById("sencontrol").addEventListener("click", pauseGame);
         window.addEventListener("pointerup", start);
         document.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchmove', handleTouchMove, false);
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener("visibilitychange", saveGame);
-        document.getElementById("sencontrol").addEventListener("focusin", pauseGame);
     });
 });
