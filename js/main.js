@@ -19,10 +19,12 @@ let sfxmusic,
     sfxlevel;
 const canvas = document.getElementById("playfield"),
       scoreContainer = document.getElementById("score-container"),
-      levelContainer = document.getElementById("level-container"),
       scoreboard = document.getElementById("scoreboard"),
       square_img = document.getElementById("square"),
-      tip = document.getElementById("tip");
+      settingsBtn = document.getElementById("settings"),
+      gameArea = document.getElementById("game-area"),
+      overlay = document.getElementById("overlay"),
+      menu = document.getElementById("menu");
 
 const width = canvas.width,
       height = canvas.height,
@@ -92,7 +94,7 @@ function incScore(amount) {
     scoreContainer.innerHTML = score += amount;
     newlevel = Math.floor((score+100)/100);
     if (newlevel !== level) {
-        levelContainer.innerHTML = level = newlevel;
+        level = newlevel;
         window.highscores.setScore(score);
         if (level > 1) {
             speed = 450 - 25*(level-1);
@@ -307,10 +309,9 @@ function spawn(type) {
 		    setField();
 		    window.highscores.setScore(score);
                     scoreboard.classList.add("opened");
-                    tip.innerHTML="<br>Touch anywhere to start";
 		    clearGame();
 		    scoreContainer.innerHTML = score = 0;
-		    levelContainer.innerHTML = level = 1;
+		    level = 1;
 		    speed = 450;
 		    sfxlost.play();
 		    sfxmusic.pause();
@@ -545,31 +546,23 @@ function move(x, field, piece, render) { // input x: -1, 1
 }
 
 function start() {
-    if (!started) {
-	if(localStorage.playfield) {
-            scoreboard.classList.remove("opened");
-	    game_interval = setInterval(()=>{
-                fall(playfield, falling, true);
-            }, speed);
-	    started = true;
-	}
-	else {
-	    spawn_rand();
-	    scoreboard.classList.remove("opened");
-	    game_interval = setInterval(() => {
-                fall(playfield, falling, true);
-            }, speed);
-	    started = true;
-	}
+    if (paused) {
+        hideMenu();
+        paused = false;
+        if (started) sfxmusic.play();
+    } else if (!started) {
+	if (!localStorage.playfield) spawn_rand();
+        scoreboard.classList.remove("opened");
+	game_interval = setInterval(() => {
+            fall(playfield, falling, true);
+        }, speed);
+	started = true;
 	sfxmusic.rate(1);
+        if (!sfxmusic.playing()) {
+            sfxmusic.play();
+        }
     } else {
-        if(!paused)
-          rotate(playfield, falling, true);
-    }
-    paused = false;
-    tip.innerHTML="";
-    if(!sfxmusic.playing()){
-       sfxmusic.play();
+        rotate(playfield, falling, true);
     }
 }
 
@@ -646,7 +639,7 @@ function saveGame() {
 function restoreGame() {
     sensibility = Number(localStorage.sensibility) || 5;
     scoreContainer.innerHTML = score = Number(localStorage.score) || 0;
-    levelContainer.innerHTML = level = Math.floor((score+100)/100);
+    level = Math.floor((score+100)/100);
     if (localStorage.playfield) {
         playfield = JSON.parse(localStorage.playfield);
         falling = JSON.parse(localStorage.falling);
@@ -757,13 +750,17 @@ function onKeyDown(event) {
     }
 }
 
-const pauseGame = (event) => {
-   event.preventDefault(); 
-   event.stopPropagation();
-   paused = true;
-   tip.innerHTML = "<br>Touch anywhere to start";
-   sfxmusic.pause();
-};
+function showMenu() {
+    menu.classList.add("opened");
+    gameArea.classList.add("blur");
+    overlay.classList.add("visible");
+}
+
+function hideMenu() {
+    menu.classList.remove("opened");
+    gameArea.classList.remove("blur");
+    overlay.classList.remove("visible");
+}
 
 function loadAssets() {
   sfxmusic = new Howl({src: ["sounds/music.mp3"],loop: true, volume:0.4});
@@ -781,8 +778,18 @@ window.addEventListener("load", () => {
         setField();
         restoreGame();
         scoreboard.classList.add("opened");
-        document.getElementById("sencontrol").addEventListener("click", pauseGame);
-        window.addEventListener("pointerup", start);
+        settingsBtn.addEventListener("pointerup", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            paused = true;
+            sfxmusic.pause();
+            showMenu();
+        });
+        menu.addEventListener("pointerup", () => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+        document.addEventListener("pointerup", start);
         document.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchmove', handleTouchMove, false);
         document.addEventListener('keydown', onKeyDown);

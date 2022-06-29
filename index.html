@@ -9,34 +9,27 @@
     <body>
 	<div class="center">
 	    <div id="game">
-		<canvas id="playfield" width="1000" height="2000"></canvas>
-                <div id="score" class="label"><img src="./img/trophy.svg"/> <span id="score-container"></span></div>
-                <div id="level" class="label"><img src="./img/level.svg"/> <span id="level-container"></span></div>
-		<div id="scoreboard"></div>
-	    </div>
-	    <br>
-	    <div class="UI">Gesture sensitivity: <select id="sencontrol">
-		<option value="1">1</option>
-		<option value="2">2</option>
-		<option value="3">3</option>
-		<option value="4" selected>4</option>
-		<option value="5">5</option>
-		<option value="6">6</option>
-		<option value="7">7</option>
-		<option value="8">8</option>
-		<option value="9">9</option>
-		<option value="10">10</option>
-	    </select></div>
-	    <div class="UI" id="tip">
-		<br>Touch anywhere to start
-                <!--
-		     <button onclick="move(-1, playfield, falling, true)">&larr;</button>
-		     <button onclick="rotate(playfield, falling, true)">&#8635;</button>
-		     <button onclick="move(1, playfield, falling, true)">&rarr;</button>
-		     <p></p>
-		     <br>
-		     <button onclick="fall(playfield, falling, true)">&darr;</button>
-		-->
+                <div id="menu">
+                    Gesture sensitivity: <select id="sencontrol">
+		    <option value="1">1</option>
+		    <option value="2">2</option>
+		    <option value="3">3</option>
+		    <option value="4">4</option>
+		    <option value="5" selected>5</option>
+		    <option value="6">6</option>
+		    <option value="7">7</option>
+		    <option value="8">8</option>
+		    <option value="9">9</option>
+		    <option value="10">10</option>
+	            </select>
+                </div>
+                <div id="overlay" class="overlay"></div>
+                <div id="game-area">
+		    <canvas id="playfield" width="1000" height="2000"></canvas>
+                    <div id="score" class="label"><img src="./img/trophy.svg"/> <span id="score-container"></span></div>
+                    <div id="settings" class="label"><img src="./img/settings.svg"/></div>
+		    <div id="scoreboard"></div>
+                </div>
 	    </div>
 	</div>
 	<div class="hidden">
