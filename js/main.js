@@ -738,8 +738,12 @@ function onKeyDown(event) {
 	keyCode = event.keyCode;
     }
     if (keyCode === KeyCodes.SPACE) {
-        if (started || paused) {
+        if (paused) {
 	    onClick();
+        } else if (started) {
+            paused = true;
+            sfxmusic.pause();
+            showMenu();
         } else {
             start();
         }
