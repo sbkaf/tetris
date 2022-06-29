@@ -4,6 +4,7 @@
   "entries": [
     "dist/assets",
     "dist/index.html",
+    "sounds",
     "icon.png",
     "manifest.toml"
   ],
