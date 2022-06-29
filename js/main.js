@@ -1,5 +1,5 @@
-import "./webxdc-scores.js"
-import './howler.js';
+import './webxdc-scores.js'
+import {Howl} from 'howler';
 
 let game_interval = 0,
     score = 0,
