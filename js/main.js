@@ -6,7 +6,6 @@ let game_interval = 0,
     level = 1,
     newlevel = 1,
     speed = 450,
-    sensibility = 5,
     started = false,
     paused = false;
 let playfield = new Array(22),
@@ -24,6 +23,7 @@ const canvas = document.getElementById("playfield"),
       settingsBtn = document.getElementById("settings"),
       gameArea = document.getElementById("game-area"),
       overlay = document.getElementById("overlay"),
+      sensibilitySelect = document.getElementById("sencontrol"),
       menu = document.getElementById("menu");
 
 const width = canvas.width,
@@ -627,7 +627,7 @@ function rePaint(refresh) {
 }
 
 function saveGame() {
-    localStorage.sensibility = document.getElementById("sencontrol").selectedIndex+1;
+    localStorage.sensibility = sensibilitySelect.value;
     if (started) {
         localStorage.playfield = JSON.stringify(playfield);
         localStorage.falling = JSON.stringify(falling);
@@ -637,14 +637,14 @@ function saveGame() {
 }
 
 function restoreGame() {
-    sensibility = Number(localStorage.sensibility) || 5;
+    let sensibility = Number(localStorage.sensibility) || 5;
     scoreContainer.innerHTML = score = Number(localStorage.score) || 0;
     level = Math.floor((score+100)/100);
     if (localStorage.playfield) {
         playfield = JSON.parse(localStorage.playfield);
         falling = JSON.parse(localStorage.falling);
         dirty_rows = JSON.parse(localStorage.dirty_rows);
-        document.getElementById("sencontrol").selectedIndex=sensibility-1;
+        sensibilitySelect.selectedIndex = 10 - sensibility;
         speed = 450 - 25*(level-1);
         dirty = true;
         rePaint(true);
@@ -682,7 +682,7 @@ function handleTouchMove(evt) {
 
     let xDiff = xDown - xUp;
     let yDiff = yDown - yUp;
-    sensibility = Number(document.getElementById("sencontrol").value);
+    let sensibility = Number(sensibilitySelect.value);
 
     if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
         /* right swipe */
