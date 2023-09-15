@@ -89,7 +89,6 @@ function setField() {
 }
 
 function checkClear(max) {
-  // todo: check and clear up to max
   for (let row = 0; row <= max && row < playfield.length; ++row) {
     if (
       playfield[row][0] > 0 &&
@@ -103,14 +102,13 @@ function checkClear(max) {
       playfield[row][8] > 0 &&
       playfield[row][9] > 0
     ) {
-      playfield.splice(row, 1);
-      playfield.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      playfield.splice(row, 1); // delete row
+      playfield.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // insert empty row at the top
+      incScore(10); // increment score
       for (let i = 0; i <= row; ++i) {
         if (i > 1 && !dirty_rows[i - 2]) {
           dirty_rows[i - 2] = true;
           if (!dirty) dirty = true;
-          incScore(1);
-          //console.log("clear "+i);
         }
       }
     }
