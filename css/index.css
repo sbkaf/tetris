@@ -17,12 +17,15 @@ body {
   width: 100%;
   overflow: hidden;
   color: #ffffdc;
-  background-color: black;
 }
 
 canvas {
   height: 90vh;
   width: auto;
+}
+
+#root {
+  display: block !important;
 }
 
 #background {

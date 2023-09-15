@@ -9,53 +9,56 @@
     <link href="./css/index.css" rel="stylesheet" />
     <script src="webxdc.js"></script>
   </head>
-  <body>
-    <div class="center">
-      <div id="game">
-        <div id="menu">
-          <div style="padding: 0.5em">
-            <h2 style="margin: 0 0 1em 0">Settings</h2>
-            Gesture sensitivity:
-            <select id="sencontrol">
-              <option value="10">1</option>
-              <option value="9">2</option>
-              <option value="8">3</option>
-              <option value="7">4</option>
-              <option value="6">5</option>
-              <option value="5" selected>6</option>
-              <option value="4">7</option>
-              <option value="3">8</option>
-              <option value="2">9</option>
-              <option value="1">10</option>
-            </select>
+  <body style="background-color: black;">
+    <div id="root" style="display: none">
+      <div class="center">
+        <div id="game">
+          <div id="menu">
+            <div style="padding: 0.5em">
+              <h2 style="margin: 0 0 1em 0">Settings</h2>
+              Gesture sensitivity:
+              <select id="sencontrol">
+                <option value="10">1</option>
+                <option value="9">2</option>
+                <option value="8">3</option>
+                <option value="7">4</option>
+                <option value="6">5</option>
+                <option value="5" selected>6</option>
+                <option value="4">7</option>
+                <option value="3">8</option>
+                <option value="2">9</option>
+                <option value="1">10</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div id="overlay" class="overlay"></div>
-        <div id="game-area">
-          <canvas
-            id="playfield"
-            class="blur"
-            width="1000"
-            height="2000"
-          ></canvas>
-          <div id="score" class="label">
-            <img src="./img/trophy.svg" /> <span id="score-container"></span>
-          </div>
-          <div id="settings" class="label">
-            <img src="./img/settings.svg" />
-          </div>
-          <div id="scoreboard"></div>
-          <div id="start" class="label">
-            <img src="./img/start.svg" /><span style="font-size: 1.3em">
-              Play</span
-            >
+          <div id="overlay" class="overlay"></div>
+          <div id="game-area">
+            <canvas
+              id="playfield"
+              class="blur"
+              width="1000"
+              height="2000"
+            ></canvas>
+            <div id="score" class="label">
+              <img src="./img/trophy.svg" /> <span id="score-container"></span>
+            </div>
+            <div id="settings" class="label">
+              <img src="./img/settings.svg" />
+            </div>
+            <div id="scoreboard"></div>
+            <div id="start" class="label">
+              <img src="./img/start.svg" /><span style="font-size: 1.3em">
+                Play</span
+              >
+            </div>
           </div>
         </div>
       </div>
+      <div class="hidden">
+        <img id="square" src="img/square.png" width="100" height="100" />
+      </div>
     </div>
-    <div class="hidden">
-      <img id="square" src="img/square.png" width="100" height="100" />
-    </div>
+
     <script type="module" src="./js/main.js"></script>
   </body>
 </html>
