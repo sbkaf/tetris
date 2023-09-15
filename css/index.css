@@ -5,85 +5,86 @@
   user-select: none;
   -webkit-touch-callout: none;
   cursor: default;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 body {
-    -webkit-text-size-adjust: none;
-    font-family: Arial, sans-serif;
-    height:100%;
-    margin:0px;
-    padding:0px;
-    width:100%;
-    overflow: hidden;
-    color: #ffffdc;
-    background-color: black;
+  -webkit-text-size-adjust: none;
+  font-family: Arial, sans-serif;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  overflow: hidden;
+  color: #ffffdc;
+  background-color: black;
 }
 
 canvas {
-    height: 90vh;
-    width: auto;
+  height: 90vh;
+  width: auto;
 }
 
 #background {
-    position: absolute;
-    top: 0;
-    z-index: -2;
+  position: absolute;
+  top: 0;
+  z-index: -2;
 }
 
 #playfield {
-    z-index: -1;
-    border: solid 1px gray;
+  z-index: -1;
+  border: solid 1px gray;
 }
 
 #game {
-    margin-top: 5px;
-    display: inline-block;
-    position: relative;
+  margin-top: 5px;
+  display: inline-block;
+  position: relative;
 }
 
 #score {
-    top: 0.1em;
-    left: 0.1em;
+  top: 0.1em;
+  left: 0.1em;
 }
 
 #settings {
-    top: 0.1em;
-    right: 0.1em;
-    padding: 0.3em;
+  top: 0.1em;
+  right: 0.1em;
+  padding: 0.3em;
 }
-#settings, #settings * {
-    cursor: pointer;
+#settings,
+#settings * {
+  cursor: pointer;
 }
 #menu {
-    visibility: hidden;
-    position: absolute;
-    top: 15%;
-    left: 5%;
-    width: 90%;
-    min-height: 10%;
-    max-height: 70%;
-    font-weight: bold;
-    border-radius: 0.3em;
-    background: rgba(0,0,0,0.8);
-    z-index: 6;
-    border: solid 1px gray;
+  visibility: hidden;
+  position: absolute;
+  top: 15%;
+  left: 5%;
+  width: 90%;
+  min-height: 10%;
+  max-height: 70%;
+  font-weight: bold;
+  border-radius: 0.3em;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 6;
+  border: solid 1px gray;
 }
 #menu.opened {
-    visibility: visible;
+  visibility: visible;
 }
 .overlay {
-    position: fixed;
-    display: none;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 5;
-    cursor: pointer;
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 5;
+  cursor: pointer;
 }
 .overlay.visible {
   display: flex;
@@ -94,62 +95,63 @@ canvas {
 }
 
 #start {
-    width: 40%;
-    left: 30%;
-    bottom: 1em;
-    background: rgba(0,0,0,0.8);
-    border: solid 1px gray;
+  width: 40%;
+  left: 30%;
+  bottom: 1em;
+  background: rgba(0, 0, 0, 0.8);
+  border: solid 1px gray;
 }
-#start, #start * {
-    cursor: pointer;
+#start,
+#start * {
+  cursor: pointer;
 }
 
 .label {
-    position: absolute;
-    display: inline-block;
-    z-index: 2;
-    padding: 0.2em;
-    border-radius: 0.3em;
-    background: rgba(0,0,0,0.3);
+  position: absolute;
+  display: inline-block;
+  z-index: 2;
+  padding: 0.2em;
+  border-radius: 0.3em;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .label img {
-    width: 1.3em;
+  width: 1.3em;
 }
 
 .center {
-    text-align: center;
+  text-align: center;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .buttons {
-    position: absolute;
-    top: 0;
+  position: absolute;
+  top: 0;
 }
 
 button {
-    margin: 0 0.4cm;
-    border-width: 2px;
-    border-radius: 10px;
-    height: 6vh;
-    width: 9vh;
-    background-color: black;
-    font-weight: inherit;
-    color: inherit;
+  margin: 0 0.4cm;
+  border-width: 2px;
+  border-radius: 10px;
+  height: 6vh;
+  width: 9vh;
+  background-color: black;
+  font-weight: inherit;
+  color: inherit;
 }
 
 p {
-    font-weight: inherit;
-    color: inherit;
+  font-weight: inherit;
+  color: inherit;
 }
 
 #start_btn {
-    position: absolute;
-    top: 40vh;
-    left: center;
+  position: absolute;
+  top: 40vh;
+  left: center;
 }
 
 .blur {
@@ -161,56 +163,58 @@ p {
 }
 
 #scoreboard {
-    position: absolute;
-    top: 15%;
-    left: 5%;
-    width: 90%;
-    font-weight: bold;
-    background: rgba(0,0,0,0.5);
-    border-radius: 0.3em;
-    visibility: hidden;
-    overflow: auto;
-    max-height: 0;
-    opacity: 0;
-    transition: opacity .2s ease-in,max-height .4s ease-in
+  position: absolute;
+  top: 15%;
+  left: 5%;
+  width: 90%;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 0.3em;
+  visibility: hidden;
+  overflow: auto;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease-in,
+    max-height 0.4s ease-in;
 }
 
 #scoreboard.opened {
-    opacity: 1;
-    visibility: visible;
-    max-height: 70%;
-    z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  max-height: 70%;
+  z-index: 2;
 }
 
 /* webxdc-scores.js styles */
 .score-row {
-    text-align: left;
-    padding: 5px 10px;
-    margin: 1% 6%;
-    border-radius: 0.3em;
-    color: rgb(255,255,220);
-    font-weight: bold;
+  text-align: left;
+  padding: 5px 10px;
+  margin: 1% 6%;
+  border-radius: 0.3em;
+  color: rgb(255, 255, 220);
+  font-weight: bold;
 }
 
 .score-row.you {
-    color: #222;
-    background: rgb(255,255,220);
+  color: #222;
+  background: rgb(255, 255, 220);
 }
 
 .row-pos {
-    float: left;
-    color: #595959;
+  float: left;
+  color: #595959;
 }
 
 .row-score {
-    float: right;
-    display: inline-block;
+  float: right;
+  display: inline-block;
 }
 
 .row-name {
-    text-overflow: ellipsis;
-    display: inline-block;
-    width: 65%;
-    overflow: hidden;
-    white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+  width: 65%;
+  overflow: hidden;
+  white-space: nowrap;
 }
