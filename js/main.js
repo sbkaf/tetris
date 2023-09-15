@@ -5,7 +5,7 @@ let game_interval = 0,
   score = 0,
   level = 1,
   newlevel = 1,
-  speed = 450,
+  speed,
   started = false,
   paused = false;
 let playfield = new Array(22),
@@ -51,6 +51,33 @@ let KeyCodes = {
   ARROWD: 40,
 };
 
+function randomChoice(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
+function setLevel(newLevel) {
+  level = newLevel;
+  const oldSpeed = speed;
+  speed = 450 - 25 * Math.min(level - 1, 9);
+  if (!started) {
+    // clear game interval on game over
+    if (game_interval) {
+      clearInterval(game_interval);
+      game_interval = 0;
+    }
+    return;
+  }
+
+  if (oldSpeed !== speed || !game_interval) {
+    // speed change or game start
+    if (game_interval) clearInterval(game_interval);
+    game_interval = setInterval(() => {
+      fall(playfield, falling, true);
+    }, speed);
+  }
+}
+
 function setField() {
   for (let i = 0; i < playfield.length; ++i) {
     playfield[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -94,15 +121,8 @@ function incScore(amount) {
   scoreContainer.innerHTML = score += amount;
   newlevel = Math.floor((score + 100) / 100);
   if (newlevel !== level) {
-    level = newlevel;
+    setLevel(newlevel);
     window.highscores.setScore(score);
-    if (level > 1) {
-      speed = 450 - 25 * (level - 1);
-      clearInterval(game_interval);
-      game_interval = setInterval(() => {
-        fall(playfield, falling, true);
-      }, speed);
-    }
     sfxlevel.play();
   } else {
     if (!sfxlevel.playing()) sfxscore.play();
@@ -403,8 +423,8 @@ function spawn(type) {
       const col = falling.loc[1] + j;
       if (falling.shape[0][i][j] > 0) {
         if (playfield[row][col] > 0) {
-          clearInterval(game_interval);
           started = false;
+          setLevel(1);
           setField();
           window.highscores.setScore(score);
           scoreboard.classList.add("opened");
@@ -412,8 +432,6 @@ function spawn(type) {
           startBtn.classList.remove("hidden");
           clearGame();
           scoreContainer.innerHTML = score = 0;
-          level = 1;
-          speed = 450;
           sfxlost.play();
           sfxmusic.pause();
           break;
@@ -430,38 +448,7 @@ function spawn(type) {
 }
 
 function spawn_rand() {
-  let extra = 0;
-  if (level < 5) {
-    extra = 0;
-  } else if (level < 10) {
-    extra = 1;
-  } else if (level < 15) {
-    extra = 2;
-  } else {
-    extra = 3;
-  }
-  const type = Math.random() * (7 + extra); // [0, 8) = ijlostz-~+
-  if (type < 1) {
-    spawn("I");
-  } else if (type < 2) {
-    spawn("J");
-  } else if (type < 3) {
-    spawn("L");
-  } else if (type < 4) {
-    spawn("O");
-  } else if (type < 5) {
-    spawn("S");
-  } else if (type < 6) {
-    spawn("T");
-  } else if (type < 7) {
-    spawn("Z");
-  } else if (type < 8) {
-    spawn("-");
-  } else if (type < 9) {
-    spawn("~");
-  } else {
-    spawn("+");
-  }
+  spawn(randomChoice("IJLOSTZ"));
 }
 
 function fall(field, piece, render) {
@@ -647,10 +634,8 @@ function start() {
     startBtn.classList.add("hidden");
     scoreboard.classList.remove("opened");
     canvas.classList.remove("blur");
-    game_interval = setInterval(() => {
-      fall(playfield, falling, true);
-    }, speed);
     started = true;
+    setLevel(level);
     sfxmusic.rate(1);
     if (!sfxmusic.playing()) {
       sfxmusic.play();
@@ -749,7 +734,6 @@ function restoreGame() {
     falling = JSON.parse(localStorage.falling);
     dirty_rows = JSON.parse(localStorage.dirty_rows);
     sensibilitySelect.selectedIndex = 10 - sensibility;
-    speed = 450 - 25 * (level - 1);
     dirty = true;
     rePaint(true);
   }
