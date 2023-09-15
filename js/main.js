@@ -1,4 +1,4 @@
-import './webxdc-scores.js'
+import 'webxdc-scores';
 import {Howl} from 'howler';
 
 let game_interval = 0,
