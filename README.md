@@ -1,4 +1,4 @@
-# Tetris.xdc
+# Tetris
 
 Simple HTML5-Canvas/JavaScript Tetris game implementation for Webxdc.
 
@@ -6,7 +6,7 @@ Simple HTML5-Canvas/JavaScript Tetris game implementation for Webxdc.
 
 ### Installing Dependencies
 
-After cloning this repo, install dependecies:
+After cloning this repo, install dependencies:
 
 ```
 pnpm i
@@ -23,9 +23,7 @@ pnpm check
 To test your work in your browser (with hot reloading!) while developing:
 
 ```
-pnpm dev-mini
-# Alternatively to test in a more advanced WebXDC emulator:
-pnpm dev
+pnpm start
 ```
 
 ### Building
