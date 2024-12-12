@@ -1,4 +1,11 @@
-import "webxdc-scores";
+import "./main.css";
+import musicUrl from "/assets/sounds/music.mp3";
+import scoreUrl from "/assets/sounds/score.mp3";
+import collisionUrl from "/assets/sounds/collision.mp3";
+import lostUrl from "/assets/sounds/lost.mp3";
+import levelUrl from "/assets/sounds/level.mp3";
+
+import "@webxdc/highscores";
 import { Howl } from "howler";
 
 let game_interval = 0,
@@ -851,46 +858,52 @@ function hideMenu() {
 }
 
 function loadAssets() {
-  sfxmusic = new Howl({ src: ["sounds/music.mp3"], loop: true, volume: 0.4 });
-  sfxscore = new Howl({ src: ["sounds/score.mp3"], loop: false });
-  sfxcollision = new Howl({ src: ["sounds/collision.mp3"], loop: false });
-  sfxlost = new Howl({ src: ["sounds/lost.mp3"], loop: false });
-  sfxlevel = new Howl({ src: ["sounds/level.mp3"], loop: false });
+  sfxmusic = new Howl({ src: [musicUrl], loop: true, volume: 0.4 });
+  sfxscore = new Howl({ src: [scoreUrl], loop: false });
+  sfxcollision = new Howl({ src: [collisionUrl], loop: false });
+  sfxlost = new Howl({ src: [lostUrl], loop: false });
+  sfxlevel = new Howl({ src: [levelUrl], loop: false });
 }
 
 loadAssets();
 
 window.addEventListener("load", () => {
   window.requestAnimationFrame(draw);
-  window.highscores.init("Tetris", "scoreboard").then(() => {
-    setField();
-    restoreGame();
-    scoreboard.classList.add("opened");
-    settingsBtn.addEventListener("pointerup", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      paused = true;
-      sfxmusic.pause();
-      showMenu();
+  window.highscores
+    .init({
+      onHighscoresChanged: () => {
+        scoreboard.innerHTML = window.highscores.renderScoreboard().innerHTML;
+      },
+    })
+    .then(() => {
+      setField();
+      restoreGame();
+      scoreboard.classList.add("opened");
+      settingsBtn.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        paused = true;
+        sfxmusic.pause();
+        showMenu();
+      });
+      menu.addEventListener("pointerup", () => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+      overlay.addEventListener("pointerup", () => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick();
+      });
+      startBtn.addEventListener("pointerup", () => {
+        event.preventDefault();
+        event.stopPropagation();
+        start();
+      });
+      document.addEventListener("pointerup", onClick);
+      document.addEventListener("touchstart", handleTouchStart, false);
+      document.addEventListener("touchmove", handleTouchMove, false);
+      document.addEventListener("keydown", onKeyDown);
+      document.addEventListener("visibilitychange", saveGame);
     });
-    menu.addEventListener("pointerup", () => {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    overlay.addEventListener("pointerup", () => {
-      event.preventDefault();
-      event.stopPropagation();
-      onClick();
-    });
-    startBtn.addEventListener("pointerup", () => {
-      event.preventDefault();
-      event.stopPropagation();
-      start();
-    });
-    document.addEventListener("pointerup", onClick);
-    document.addEventListener("touchstart", handleTouchStart, false);
-    document.addEventListener("touchmove", handleTouchMove, false);
-    document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("visibilitychange", saveGame);
-  });
 });
